@@ -27,7 +27,7 @@ with DAG(
     'placeholder',
     default_args=default_args,
     description='Placeholder dag',
-    schedule_interval=timedelta(minutes=1)) as dag:
+    schedule_interval=timedelta(hours=1)) as dag:
 
     sleep_task = PythonOperator(
         task_id='sleep',
