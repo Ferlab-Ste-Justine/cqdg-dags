@@ -14,4 +14,4 @@ jobs:
     - name: Install pylint
       run: pip install pylint===2.6.0
     - name: Run pylint
-      run: pylint --ignore=LICENSE,README.md,.github **/*.py
+      run: su -c "pylint --ignore=LICENSE,README.md,.github **/*.py" airflow
