@@ -6,10 +6,10 @@ jobs:
   Deploy:
     name: Lint DAGs
     runs-on: ubuntu-18.04
-    container: apache/airflow:1.10.14-python3.7
+    container:
+      image: apache/airflow:1.10.14-python3.7
+      options: --user 0
     steps:
-    - name: Install git
-      run: apt-get update && apt-get install -y git
     - uses: actions/checkout@v2
     - name: Install pylint
       run: pip install pylint===2.6.0
