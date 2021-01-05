@@ -49,8 +49,25 @@ with DAG(
         arguments=["5"],
         get_logs=True,
         hostnetwork=False,
-        in_cluster=False
+        in_cluster=True
     )
 
+    sleep_more_spark_ns_task = KubernetesPodOperator(
+        name="sleep_more_spark_ns",
+        task_id="sleep_more_spark_ns",
+        namespace="spark",
+        labels={
+            "app": "sleep-more"
+        },
+        image="ubuntu:20.04",
+        image_pull_policy="Always",
+        cmds=["sleep"],
+        arguments=["5"],
+        get_logs=True,
+        hostnetwork=False,
+        in_cluster=True
+    )
+
+
     # pylint: disable=pointless-statement
-    sleep_task >> sleep_more_task
+    sleep_task >> [ sleep_more_task, sleep_more_spark_ns_task ]
