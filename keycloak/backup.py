@@ -2,7 +2,6 @@
 Keycloak backup DAG
 """
 from datetime import timedelta
-import time
 from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.kubernetes.secret import Secret
