@@ -6,7 +6,6 @@ from airflow import DAG
 from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
 from airflow.kubernetes.secret import Secret
 from airflow.utils.dates import days_ago
-from kubernetes.client import models as k8s
 
 default_args = {
     'owner': 'airflow',
@@ -44,7 +43,6 @@ with DAG(
         },
         image="ferlabcrsj/postgres-backup:5290098c52196a704f085ae8ace88d199d48c792",
         image_pull_policy="Always",
-        image_pull_secrets=[k8s.V1LocalObjectReference('images-pull')],
         cmds=["python3"],
         arguments=["/opt/backup.py"],
         get_logs=True,
@@ -63,7 +61,6 @@ with DAG(
         },
         image="ferlabcrsj/postgres-backup:5290098c52196a704f085ae8ace88d199d48c792",
         image_pull_policy="Always",
-        image_pull_secrets=[k8s.V1LocalObjectReference('images-pull')],
         cmds=["python3"],
         arguments=["/opt/prune-backups.py"],
         get_logs=True,
