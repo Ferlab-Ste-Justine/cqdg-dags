@@ -28,6 +28,8 @@ show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 fhavro_export_image = 'ferlabcrsj/fhavro-export'
 spark_image = 'ferlabcrsj/spark:3.3.1'
 spark_service_account = 'spark'
+cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
+
 
 if env == Env.QA:
     es_url = 'http://elasticsearch:9200'
