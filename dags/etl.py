@@ -3,8 +3,8 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from config import env, Env, K8sContext
-from operators.spark import SparkOperator
+from lib.config import env, Env, K8sContext
+from lib.operators.spark import SparkOperator
 
 if env in [Env.QA, Env.DEV]:
 
