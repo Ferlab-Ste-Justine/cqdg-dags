@@ -2,6 +2,8 @@ from airflow import DAG
 from airflow.models.param import Param
 
 from datetime import datetime
+
+from dags.lib.operators.fhavro import FhavroOperator
 from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
@@ -21,6 +23,35 @@ with DAG(
         },
 ) as dag:
 
+    fhavro_export_task = FhavroOperator(
+        task_id='fhavro-import-task',
+        name='etl-fhavro-import-task',
+        k8s_context=K8sContext.ETL,
+        spark_jar=config.spark_index_jar,
+        spark_class='bio.ferlab.fhir.etl.FhavroExport',
+        spark_config='enriched-etl',
+        arguments=['7', 'ST0000017', 'dev'],
+    )
+
+    import_task = SparkOperator(
+        task_id='import-task',
+        name='etl-import-task',
+        k8s_context=K8sContext.ETL,
+        spark_jar=config.spark_index_jar,
+        spark_class='bio.ferlab.fhir.etl.ImportTask',
+        spark_config='enriched-etl',
+        arguments=['./config/dev-cqdg.conf', 'default', '5', 'STU0000001'],
+    )
+
+    prepare_index_task = SparkOperator(
+        task_id='prepare-index-task',
+        name='etl-prepare-index-task',
+        k8s_context=K8sContext.ETL,
+        spark_jar=config.spark_index_jar,
+        spark_class='bio.ferlab.fhir.etl.PrepareIndex',
+        spark_config='enriched-etl',
+        arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
+    )
 
     index_task = SparkOperator(
         task_id='index-task',
