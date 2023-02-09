@@ -3,7 +3,6 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 
