@@ -1,0 +1,6 @@
+.env
+.idea
+dags/__pycache*
+dags/lib/__pycache__*
+logs/*
+
