@@ -1,6 +1,6 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
-from dags.lib import config
+from lib import config
 from lib.config import env_url
 
 class FhavroOperator(KubernetesPodOperator):
