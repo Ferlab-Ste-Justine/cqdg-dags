@@ -3,6 +3,11 @@ from airflow.models.param import Param
 
 from datetime import datetime
 
+from dags.lib import config
+from dags.lib.operators.fhavro import FhavroOperator
+from dags.lib.config import env, Env, K8sContext
+from dags.lib.operators.spark import SparkOperator
+
 # from spark import SparkOperator
 # from . import SparkOperator
 
