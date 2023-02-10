@@ -17,7 +17,7 @@ with DAG(
             'release_id': Param('5', type='string'),
             'study_ids': Param('STU0000001', type='string'),
             'jobType': Param('participant_centric', type='string'),
-            'env': Param('qa', enum=['dev', 'qa', 'prd']),
+            # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
