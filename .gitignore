@@ -3,4 +3,5 @@
 dags/__pycache*
 dags/lib/__pycache__*
 logs/*
+__pycache__
 
