@@ -3,7 +3,7 @@ from airflow.models.param import Param
 
 from datetime import datetime
 
-from spark import SparkOperator
+# from . import SparkOperator
 from fhavro import FhavroOperator
 
 # from lib import config
