@@ -3,19 +3,11 @@
 
 # from datetime import datetime
 
-<<<<<<< Updated upstream
-# from lib import config
-# from lib.operators.fhavro import FhavroOperator
-# from lib.config import env, Env, K8sContext
-from operators.spark import SparkOperator
-# if env in [Env.QA, Env.DEV]:
-=======
 # # from lib import config
 # # from lib.operators.fhavro import FhavroOperator
 # # from lib.config import env, Env, K8sContext
 # # from lib.operators.spark import SparkOperator
 # # if env in [Env.QA, Env.DEV]:
->>>>>>> Stashed changes
 
 # with DAG(
 #         dag_id='etl',
