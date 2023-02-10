@@ -1,10 +1,9 @@
 from airflow import DAG
-from airflow.utils.dates import days_ago
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from airflow.operators.python import PythonOperator
-from kubernetes import client, config
 from airflow.models import Variable
-import logging
+from airflow.models.param import Param
+from datetime import datetime
+from lib.operators.spark import SparkOperator
+
 default_args = {
     "owner": "ihannache",
     "depends_on_past": False,
@@ -15,31 +14,56 @@ default_args = {
 
 namespace=Variable.get("kubernetes_namespace")
 
-def _spark_task_check(ti):
-    config.load_incluster_config()
-    v1 = client.CoreV1Api()
-    pod = v1.list_namespaced_pod(
-        namespace=namespace,
-        limit=3,
+with DAG(
+        dag_id='etl',
+        start_date=datetime(2022, 1, 1),
+        schedule_interval=None,
+        params={
+            'release_id': Param('5', type='string'),
+            'study_ids': Param('STU0000001', type='string'),
+            'jobType': Param('participant_centric', type='string'),
+            'env': Param('', enum=['dev', 'qa', 'prd']),
+            'project': Param('cqdg', type='string'),
+        },
+) as dag:
+
+    # fhavro_export_task = FhavroOperator(
+    #     task_id='fhavro-import-task',
+    #     name='etl-fhavro-import-task',
+    #     k8s_context=K8sContext.ETL,
+    #     spark_jar=config.spark_index_jar,
+    #     spark_class='bio.ferlab.fhir.etl.FhavroExport',
+    #     spark_config='enriched-etl',
+    #     arguments=['7', 'ST0000017', 'dev'],
+    # )
+    #
+    # import_task = SparkOperator(
+    #     task_id='import-task',
+    #     name='etl-import-task',
+    #     k8s_context=K8sContext.ETL,
+    #     spark_jar=config.spark_index_jar,
+    #     spark_class='bio.ferlab.fhir.etl.ImportTask',
+    #     spark_config='enriched-etl',
+    #     arguments=['./config/dev-cqdg.conf', 'default', '5', 'STU0000001'],
+    # )
+    #
+    # prepare_index_task = SparkOperator(
+    #     task_id='prepare-index-task',
+    #     name='etl-prepare-index-task',
+    #     k8s_context=K8sContext.ETL,
+    #     spark_jar=config.spark_index_jar,
+    #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
+    #     spark_config='enriched-etl',
+    #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
+    # )
+
+    index_task = SparkOperator(
+        task_id='index-task',
+        name='etl-index-task',
+        # k8s_context=K8sContext.ETL,
+        k8s_context='kubernetes_context_etl',
+        spark_jar='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.0.1/index-task.jar',
+        spark_class='bio.ferlab.fhir.etl.IndexTask',
+        spark_config='enriched-etl',
+        arguments=['./config/dev-cqdg.conf', 'default', '5', 'STU0000001'],
     )
-    logging.info(pod)
-
-with DAG("k8s_hello_world", start_date=days_ago(2),
-    schedule_interval=None, catchup=False) as dag:
-        task_hello_world = KubernetesPodOperator(
-            namespace=namespace,
-            image='alpine',
-            cmds=["sh", "-c", "echo 'Hello WOrld!'"],
-            name="say-hello",
-            is_delete_operator_pod=False,
-            task_id="say-hello",
-            get_logs=True,
-        )
-
-        spark_task_check = PythonOperator(
-            task_id="spark_task_check",
-            python_callable=_spark_task_check,
-        )
-
-
-        task_hello_world >> spark_task_check
