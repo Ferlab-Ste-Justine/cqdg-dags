@@ -1,4 +1,3 @@
-import os
 from airflow import DAG
 from airflow.models.param import Param
 
@@ -11,13 +10,6 @@ from datetime import datetime
 # from lib.operators.fhavro import FhavroOperator
 # from lib.config import env, Env, K8sContext
 # from lib.operators.spark import SparkOperator
-import sys
-sys.path.insert(0,os.path.abspath(os.path.dirname(__file__)))
-from lib import config
-from lib.operators.fhavro import FhavroOperator
-from lib.config import env, Env, K8sContext
-from lib.operators.spark import SparkOperator
-
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
