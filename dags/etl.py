@@ -55,8 +55,7 @@ with DAG(
     index_task = SparkOperator(
         task_id='index-task',
         name='etl-index-task',
-        # k8s_context=K8sContext.ETL,
-        k8s_context='kubernetes_context_etl',
+        k8s_context=K8sContext.ETL,
         spark_jar='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.0.1/index-task.jar',
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='enriched-etl',
