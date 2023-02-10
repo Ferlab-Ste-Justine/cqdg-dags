@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.models.param import Param
 from datetime import datetime
-from lib.operators.spark import SparkOperator
+from core.operators.spark import SparkOperator
 
 default_args = {
     "owner": "ihannache",
