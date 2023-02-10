@@ -10,7 +10,7 @@ from lib.operators.spark import SparkOperator
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
-        dag_id='etl',
+        dag_id='etl-fhir-to-es',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
@@ -56,8 +56,8 @@ with DAG(
         task_id='index-task',
         name='etl-index-task',
         k8s_context=K8sContext.ETL,
-        spark_jar='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.0.1/index-task.jar',
+        spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='enriched-etl',
-        arguments=['./config/dev-cqdg.conf', 'default', '5', 'STU0000001'],
+        arguments=['./config/dev-cqdg.conf', 'default', '7', 'ST0000017'],
     )
