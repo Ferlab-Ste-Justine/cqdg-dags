@@ -14,7 +14,7 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'release_id': Param('5', type='string'),
+            'release_id': Param('8', type='string'),
             'study_ids': Param('STU0000001', type='string'),
             'jobType': Param('participant_centric', type='string'),
             # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
@@ -59,5 +59,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=['7', 'STU0000001', 'biospecimen_centric', 'dev', 'cqdg'],
+        arguments=['8', 'STU0000001', 'study_centric', 'dev', 'cqdg'],
     )
