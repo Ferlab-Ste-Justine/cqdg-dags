@@ -55,9 +55,9 @@ with DAG(
     index_task = SparkOperator(
         task_id='index-task',
         name='etl-index-task',
-        k8s_context=K8sContext.ETL,
+        k8s_context=K8sContext.DEFAULT,
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
-        spark_config='enriched-etl',
-        arguments=['./config/dev-cqdg.conf', 'default', '7', 'ST0000017'],
+        spark_config='etl-index-task',
+        arguments=['7', 'STU0000001', 'biospecimen_centric', 'dev', 'cqdg'],
     )
