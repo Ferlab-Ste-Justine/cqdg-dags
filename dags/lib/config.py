@@ -22,7 +22,6 @@ k8s_context = {
 }
 base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
-slack_hook_url = Variable.get('slack_hook_url', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
 fhavro_export_image = 'ferlabcrsj/fhavro-export'
