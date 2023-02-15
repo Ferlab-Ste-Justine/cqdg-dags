@@ -10,7 +10,7 @@ from lib.operators.spark import SparkOperator
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
-        dag_id='etl-fhir-to-es',
+        dag_id='etl',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
