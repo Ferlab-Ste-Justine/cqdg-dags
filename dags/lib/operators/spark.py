@@ -48,11 +48,11 @@ class SparkOperator(KubernetesPodOperator):
 
         self.cmds = ['/opt/client-entrypoint.sh']
         self.image_pull_policy = 'Always'
-        # self.image_pull_secrets = [
-        #     k8s.V1LocalObjectReference(
-        #         name='images-registry-credentials',
-        #     ),
-        # ]
+        self.image_pull_secrets = [
+            k8s.V1LocalObjectReference(
+                name='images-registry-credentials',
+            ),
+        ]
         self.env_vars = [
             k8s.V1EnvVar(
                 name='SPARK_CLIENT_POD_NAME',
