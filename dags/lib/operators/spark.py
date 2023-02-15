@@ -43,17 +43,18 @@ class SparkOperator(KubernetesPodOperator):
         self.skip_fail_env = skip_fail_env
 
     def execute(self, **kwargs):
+        print("TEST")
         time.sleep(15*60)
         if env in self.skip_env:
             raise AirflowSkipException()
 
         self.cmds = ['/opt/client-entrypoint.sh']
         self.image_pull_policy = 'Always'
-        self.image_pull_secrets = [
-            k8s.V1LocalObjectReference(
-                name='images-registry-credentials',
-            ),
-        ]
+        # self.image_pull_secrets = [
+        #     k8s.V1LocalObjectReference(
+        #         name='images-registry-credentials',
+        #     ),
+        # ]
         self.env_vars = [
             k8s.V1EnvVar(
                 name='SPARK_CLIENT_POD_NAME',
@@ -65,11 +66,11 @@ class SparkOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
-                value=config.spark_jar,
+                value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.0.1/index-task.jar',
             ),
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
-                value=self.spark_class,
+                value='bio.ferlab.fhir.etl.IndexTask',
             ),
         ]
         self.volumes = [
