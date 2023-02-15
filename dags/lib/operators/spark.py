@@ -53,14 +53,14 @@ class SparkOperator(KubernetesPodOperator):
             ),
         ]
         self.env_vars = [
-            k8s.V1EnvVar(
-                name='SPARK_CLIENT_POD_NAME',
-                value_from=k8s.V1EnvVarSource(
-                    field_ref=k8s.V1ObjectFieldSelector(
-                        field_path='metadata.name',
-                    ),
-                ),
-            ),
+            # k8s.V1EnvVar(
+            #     name='SPARK_CLIENT_POD_NAME',
+            #     value_from=k8s.V1EnvVarSource(
+            #         field_ref=k8s.V1ObjectFieldSelector(
+            #             field_path='metadata.name',
+            #         ),
+            #     ),
+            # ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
                 value=config.spark_jar,
@@ -133,40 +133,40 @@ class SparkOperator(KubernetesPodOperator):
         super().execute(**kwargs)
 
         config.k8s_load_config(self.k8s_context)
-        k8s_client = kubernetes.client.CoreV1Api()
+        # k8s_client = kubernetes.client.CoreV1Api()
 
         # Get driver pod log and delete driver pod
-        driver_pod = k8s_client.list_namespaced_pod(
-            namespace=self.pod.metadata.namespace,
-            field_selector=f'metadata.name={self.pod.metadata.name}-driver',
-            limit=1,
-        )
-        if driver_pod.items:
-            log = k8s_client.read_namespaced_pod_log(
-                name=f'{self.pod.metadata.name}-driver',
-                namespace=self.pod.metadata.namespace,
-            )
-            logging.info(f'Spark job log:\n{log}')
-            k8s_client.delete_namespaced_pod(
-                name=f'{self.pod.metadata.name}-driver',
-                namespace=self.pod.metadata.namespace,
-            )
+        # driver_pod = k8s_client.list_namespaced_pod(
+        #     namespace=self.pod.metadata.namespace,
+        #     field_selector=f'metadata.name={self.pod.metadata.name}-driver',
+        #     limit=1,
+        # )
+        # if driver_pod.items:
+        #     log = k8s_client.read_namespaced_pod_log(
+        #         name=f'{self.pod.metadata.name}-driver',
+        #         namespace=self.pod.metadata.namespace,
+        #     )
+        #     logging.info(f'Spark job log:\n{log}')
+        #     k8s_client.delete_namespaced_pod(
+        #         name=f'{self.pod.metadata.name}-driver',
+        #         namespace=self.pod.metadata.namespace,
+        #     )
 
         # Delete pod
-        pod = k8s_client.list_namespaced_pod(
-            namespace=self.pod.metadata.namespace,
-            field_selector=f'metadata.name={self.pod.metadata.name}',
-            limit=1,
-        )
-        if pod.items:
-            k8s_client.delete_namespaced_pod(
-                name=self.pod.metadata.name,
-                namespace=self.pod.metadata.namespace,
-            )
+        # pod = k8s_client.list_namespaced_pod(
+        #     namespace=self.pod.metadata.namespace,
+        #     field_selector=f'metadata.name={self.pod.metadata.name}',
+        #     limit=1,
+        # )
+        # if pod.items:
+        #     k8s_client.delete_namespaced_pod(
+        #         name=self.pod.metadata.name,
+        #         namespace=self.pod.metadata.namespace,
+        #     )
 
         # Fail task if driver pod failed
-        if driver_pod.items[0].status.phase != 'Succeeded':
-            if env in self.skip_fail_env:
-                raise AirflowSkipException()
-            else:
-                raise AirflowFailException('Spark job failed')
+        # if driver_pod.items[0].status.phase != 'Succeeded':
+        #     if env in self.skip_fail_env:
+        #         raise AirflowSkipException()
+        #     else:
+        #         raise AirflowFailException('Spark job failed')
