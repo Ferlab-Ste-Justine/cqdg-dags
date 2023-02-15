@@ -1,3 +1,5 @@
+import time
+
 import kubernetes
 import logging
 from airflow.exceptions import AirflowFailException
@@ -129,6 +131,8 @@ class SparkOperator(KubernetesPodOperator):
                     read_only=True,
                 ),
             )
+
+        time.sleep(15*60)
 
         super().execute(**kwargs)
 
