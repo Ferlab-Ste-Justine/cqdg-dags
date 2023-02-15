@@ -27,7 +27,7 @@ class SparkOperator(KubernetesPodOperator):
         super().__init__(
             is_delete_operator_pod=False,
             in_cluster=config.k8s_in_cluster(k8s_context),
-            config_file=config.k8s_config_file(k8s_context),
+            # config_file=config.k8s_config_file(k8s_context),
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
             service_account_name=config.spark_service_account,
@@ -131,8 +131,6 @@ class SparkOperator(KubernetesPodOperator):
                 ),
             )
 
-
-        print("TOTOTO")
         super().execute(**kwargs)
 
         config.k8s_load_config(self.k8s_context)
