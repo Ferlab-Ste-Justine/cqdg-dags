@@ -114,22 +114,22 @@ class SparkOperator(KubernetesPodOperator):
                     read_only=True,
                 ),
             )
-        if self.spark_secret:
-            self.volumes.append(
-                k8s.V1Volume(
-                    name=self.spark_secret,
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name=self.spark_secret,
-                    ),
-                ),
-            )
-            self.volume_mounts.append(
-                k8s.V1VolumeMount(
-                    name=self.spark_secret,
-                    mount_path=f'/opt/spark-configs/{self.spark_secret}',
-                    read_only=True,
-                ),
-            )
+        # if self.spark_secret:
+        #     self.volumes.append(
+        #         k8s.V1Volume(
+        #             name=self.spark_secret,
+        #             secret=k8s.V1SecretVolumeSource(
+        #                 secret_name=self.spark_secret,
+        #             ),
+        #         ),
+        #     )
+        #     self.volume_mounts.append(
+        #         k8s.V1VolumeMount(
+        #             name=self.spark_secret,
+        #             mount_path=f'/opt/spark-configs/{self.spark_secret}',
+        #             read_only=True,
+        #         ),
+        #     )
 
 
 
