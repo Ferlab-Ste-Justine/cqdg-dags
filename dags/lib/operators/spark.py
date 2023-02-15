@@ -153,16 +153,16 @@ class SparkOperator(KubernetesPodOperator):
             )
 
         # Delete pod
-        pod = k8s_client.list_namespaced_pod(
-            namespace=self.pod.metadata.namespace,
-            field_selector=f'metadata.name={self.pod.metadata.name}',
-            limit=1,
-        )
-        if pod.items:
-            k8s_client.delete_namespaced_pod(
-                name=self.pod.metadata.name,
-                namespace=self.pod.metadata.namespace,
-            )
+        # pod = k8s_client.list_namespaced_pod(
+        #     namespace=self.pod.metadata.namespace,
+        #     field_selector=f'metadata.name={self.pod.metadata.name}',
+        #     limit=1,
+        # )
+        # if pod.items:
+        #     k8s_client.delete_namespaced_pod(
+        #         name=self.pod.metadata.name,
+        #         namespace=self.pod.metadata.namespace,
+        #     )
 
         # Fail task if driver pod failed
         if driver_pod.items[0].status.phase != 'Succeeded':
