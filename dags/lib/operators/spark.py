@@ -27,7 +27,6 @@ class SparkOperator(KubernetesPodOperator):
         super().__init__(
             is_delete_operator_pod=False,
             in_cluster=config.k8s_in_cluster(k8s_context),
-            # config_file=config.k8s_config_file(k8s_context),
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
             service_account_name=config.spark_service_account,
@@ -86,7 +85,7 @@ class SparkOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
-                value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.6/index-task.jar',
+                value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.7/index-task.jar',
             ),
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
