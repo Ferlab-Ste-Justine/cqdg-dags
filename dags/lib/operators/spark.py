@@ -63,6 +63,28 @@ class SparkOperator(KubernetesPodOperator):
                 ),
             ),
             k8s.V1EnvVar(
+                name='AWS_ENDPOINT',
+                value='https://s3.ops.cqdg.ferlab.bio',
+            ),
+            k8s.V1EnvVar(
+                name='AWS_ACCESS_KEY',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='s3-fhir-import-credentials',
+                        key='S3_ACCESS_KEY',
+                    ),
+                ),
+            ),
+            k8s.V1EnvVar(
+                name='AWS_SECRET_KEY',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='s3-fhir-import-credentials',
+                        key='S3_SECRET_KEY',
+                    ),
+                ),
+            ),
+            k8s.V1EnvVar(
                 name='SPARK_JAR',
                 value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.4/index-task.jar',
             ),
