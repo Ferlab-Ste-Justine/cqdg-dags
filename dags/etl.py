@@ -50,7 +50,7 @@ with DAG(
     #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
     #     spark_config='enriched-etl',
     #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
-    #### )
+    # )
 
     index_task = SparkOperator(
         task_id='index-task',
@@ -59,5 +59,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=['8', 'STU0000001', 'study_centric', 'dev', 'cqdg'],
+        arguments=['7', 'ST0000017', 'study_centric', 'dev', 'cqdg'],
     )
