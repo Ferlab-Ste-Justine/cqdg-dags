@@ -17,9 +17,11 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'job_type': Param('study_centric', type='string'),
-            'env': Param('qa', type='string'),
+            'env': Param('dev', type='string'),
             # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
+            'es_host': Param('https://elasticsearch-workers', type='string'),
+            'es_port': Param('9200', type='string'),
         },
 ) as dag:
 
@@ -37,6 +39,12 @@ with DAG(
 
     def _env() -> str:
         return '{{ params.env }}'
+
+    def es_host() -> str:
+        return '{{ params.es_host }}'
+
+    def es_port() -> str:
+        return '{{ params.es_port }}'
 
     # fhavro_export_task = FhavroOperator(
     #     task_id='fhavro-import-task',
@@ -75,5 +83,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=[release_id(), study_ids(), job_type(), _env(), project(), 'https://elasticsearch-workers', '9200'],
+        arguments=[release_id(), study_ids(), job_type(), _env(), project(), es_host(), es_port()],
     )
