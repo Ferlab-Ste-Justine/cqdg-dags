@@ -59,5 +59,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=['7', 'ST0000017', 'study_centric', 'dev', 'cqdg'],
+        arguments=['7', 'ST0000017', 'study_centric', 'qa', 'cqdg'],
     )
