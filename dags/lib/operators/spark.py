@@ -85,7 +85,7 @@ class SparkOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
-                value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.20/index-task.jar',
+                value='https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.2/index-task.jar',
             ),
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
