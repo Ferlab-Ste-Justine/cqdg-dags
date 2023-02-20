@@ -14,13 +14,29 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'release_id': Param('8', type='string'),
-            'study_ids': Param('STU0000001', type='string'),
-            'jobType': Param('participant_centric', type='string'),
+            'release_id': Param('7', type='string'),
+            'study_ids': Param('ST0000017', type='string'),
+            'job_type': Param('study_centric', type='string'),
+            'env': Param('qa', type='string'),
             # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
+
+    def release_id() -> str:
+        return '{{ params.release_id }}'
+
+    def study_ids() -> str:
+        return '{{ params.study_ids }}'
+
+    def job_type() -> str:
+        return '{{ params.job_type }}'
+
+    def project() -> str:
+        return '{{ params.project }}'
+
+    def _env() -> str:
+        return '{{ params.env }}'
 
     # fhavro_export_task = FhavroOperator(
     #     task_id='fhavro-import-task',
@@ -59,5 +75,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=['7', 'ST0000017', 'study_centric', 'dev', 'cqdg'],
+        arguments=[release_id(), study_ids(), job_type(), _env(), project()],
     )
