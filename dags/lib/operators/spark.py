@@ -90,15 +90,7 @@ class SparkOperator(KubernetesPodOperator):
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
                 value='bio.ferlab.fhir.etl.IndexTask',
-            ),
-            k8s.V1EnvVar(
-                name='ES_ENDPOINT',
-                value='https://elasticsearch-workers',
-            ),
-            k8s.V1EnvVar(
-                name='ES_PORT',
-                value='9200',
-            ),
+            )
         ]
         self.volumes = [
             k8s.V1Volume(

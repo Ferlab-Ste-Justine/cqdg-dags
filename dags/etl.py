@@ -75,5 +75,5 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=[release_id(), study_ids(), job_type(), _env(), project()],
+        arguments=[release_id(), study_ids(), job_type(), _env(), project(), 'https://elasticsearch-workers', '9200'],
     )
