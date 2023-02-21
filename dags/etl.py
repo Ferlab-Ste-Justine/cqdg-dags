@@ -20,7 +20,7 @@ with DAG(
             'env': Param('dev', type='string'),
             # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
-            'es_host': Param('https://elasticsearch-workers', type='string'),
+            'es_host': Param('http://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
         },
 ) as dag:
