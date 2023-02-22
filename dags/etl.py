@@ -1,6 +1,5 @@
 from airflow import DAG
 from airflow.models.param import Param
-from airflow.utils.task_group import TaskGroup
 
 from datetime import datetime
 
@@ -8,7 +7,6 @@ from lib import config
 from lib.operators.fhavro import FhavroOperator
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
-
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
@@ -18,31 +16,35 @@ with DAG(
         params={
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
+            'job_type': Param('study_centric', type='string'),
+            'env': Param('dev', type='string'),
             # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
             'es_host': Param('http://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
         },
 ) as dag:
+
     def release_id() -> str:
         return '{{ params.release_id }}'
-
 
     def study_ids() -> str:
         return '{{ params.study_ids }}'
 
+    def job_type() -> str:
+        return '{{ params.job_type }}'
 
     def project() -> str:
         return '{{ params.project }}'
 
+    def _env() -> str:
+        return '{{ params.env }}'
 
     def es_host() -> str:
         return '{{ params.es_host }}'
 
-
     def es_port() -> str:
         return '{{ params.es_port }}'
-
 
     # fhavro_export_task = FhavroOperator(
     #     task_id='fhavro-import-task',
@@ -74,44 +76,12 @@ with DAG(
     #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
     ## )
 
-    with TaskGroup(group_id='index') as index:
-        study_centric = SparkOperator(
-            task_id='study_centric',
-            name='etl-index-task-study',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'study_centric', env, project(), es_host(), es_port()],
-        )
-
-        participant_centric = SparkOperator(
-            task_id='participant_centric',
-            name='etl-index-task-participant',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'participant_centric', env, project(), es_host(), es_port()],
-        )
-
-        file_centric = SparkOperator(
-            task_id='file_centric',
-            name='etl-index-task-file',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'file_centric', env, project(), es_host(), es_port()],
-        )
-
-        biospecimen_centric = SparkOperator(
-            task_id='biospecimen_centric',
-            name='etl-index-task-biospecimen',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), es_host(), es_port()],
-        )
-    study_centric >> participant_centric >> file_centric >> biospecimen_centric
+    index_task = SparkOperator(
+        task_id='index-task',
+        name='etl-index-task',
+        k8s_context=K8sContext.DEFAULT,
+        spark_jar=config.spark_index_jar,
+        spark_class='bio.ferlab.fhir.etl.IndexTask',
+        spark_config='etl-index-task',
+        arguments=[release_id(), study_ids(), job_type(), _env(), project(), es_host(), es_port()],
+    )
