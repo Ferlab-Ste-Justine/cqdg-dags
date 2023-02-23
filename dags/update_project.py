@@ -23,6 +23,7 @@ with DAG(
             'project': Param('cqdg', type='string'),
             'es_host': Param('http://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
+            'k8s_host': Param('k8s://https://kubernetes.default.svc.cluster.qa:443', type='string'),
         },
 ) as dag:
 
@@ -46,6 +47,9 @@ with DAG(
 
     def es_port() -> str:
         return '{{ params.es_port }}'
+
+    def k8s_host() -> str:
+        return '{{ params.k8s_host }}'
 
     # fhavro_export_task = FhavroOperator(
     #     task_id='fhavro-import-task',
@@ -84,18 +88,18 @@ with DAG(
         spark_jar=config.spark_index_jar,
         spark_class='bio.ferlab.fhir.etl.IndexTask',
         spark_config='etl-index-task',
-        arguments=[release_id(), study_ids(), job_type(), _env(), project(), es_host(), es_port()],
+        arguments=[release_id(), study_ids(), job_type(), _env(), project(), es_host(), es_port(), k8s_host()],
     )
 
-    # arranger_remove_project = ArrangerOperator(
-    #     task_id='arranger_remove_project',
-    #     name='etl-publish-arranger-remove-project',
-    #     k8s_context=K8sContext.DEFAULT,
-    #     cmds=[
-    #         'node',
-    #         '--experimental-modules=node',
-    #         '--es-module-specifier-resolution=node',
-    #         'cmd/remove_project.js',
-    #         env,
-    #     ],
-    # )
+    arranger_remove_project = ArrangerOperator(
+        task_id='arranger_remove_project',
+        name='etl-publish-arranger-remove-project',
+        k8s_context=K8sContext.DEFAULT,
+        cmds=[
+            'node',
+            '--experimental-modules=node',
+            '--es-module-specifier-resolution=node',
+            'cmd/remove_project.js',
+            env,
+        ],
+    )
