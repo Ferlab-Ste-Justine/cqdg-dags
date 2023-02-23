@@ -154,7 +154,6 @@ class SparkOperator(KubernetesPodOperator):
 
         super().execute(**kwargs)
 
-        config.k8s_load_config(self.k8s_context)
         k8s_client = kubernetes.client.CoreV1Api()
 
         # Get driver pod log and delete driver pod
