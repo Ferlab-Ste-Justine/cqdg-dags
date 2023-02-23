@@ -10,7 +10,7 @@ from lib.operators.arranger import ArrangerOperator
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
-        dag_id='pub',
+        dag_id='publish_task',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
@@ -43,7 +43,7 @@ with DAG(
     def es_port() -> str:
         return '{{ params.es_port }}'
 
-    with TaskGroup(group_id='publish]') as index:
+    with TaskGroup(group_id='publish]') as publish:
         study_publish_task = SparkOperator(
             task_id='study_publish_task',
             name='etl-publish-study-task',
