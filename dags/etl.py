@@ -86,16 +86,3 @@ with DAG(
         spark_config='etl-index-task',
         arguments=[release_id(), study_ids(), job_type(), _env(), project(), es_host(), es_port()],
     )
-
-    # arranger_remove_project = ArrangerOperator(
-    #     task_id='arranger_remove_project',
-    #     name='etl-publish-arranger-remove-project',
-    #     k8s_context=K8sContext.DEFAULT,
-    #     cmds=[
-    #         'node',
-    #         '--experimental-modules=node',
-    #         '--es-module-specifier-resolution=node',
-    #         'cmd/remove_project.js',
-    #         env,
-    #     ],
-    # )
