@@ -104,7 +104,7 @@ with DAG(
         )
 
         biospecimen_index_task = SparkOperator(
-            task_id='file_index_task',
+            task_id='biospecimen_index_task',
             name='etl-index-biospecimen-task',
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
