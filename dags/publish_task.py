@@ -43,7 +43,7 @@ with DAG(
     def es_port() -> str:
         return '{{ params.es_port }}'
 
-    with TaskGroup(group_id='publish]') as publish:
+    with TaskGroup(group_id='publish') as publish:
         study_publish_task = SparkOperator(
             task_id='study_publish_task',
             name='etl-publish-study-task',
