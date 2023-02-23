@@ -85,11 +85,11 @@ class SparkOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
-                value=config.spark_index_jar,
+                value=self.spark_jar,
             ),
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
-                value='bio.ferlab.fhir.etl.IndexTask',
+                value=self.spark_class,
             )
         ]
         self.volumes = [
