@@ -112,4 +112,4 @@ with DAG(
             spark_config='etl-index-task',
             arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), es_host(), es_port()],
         )
-
+        study_index_task >> participant_index_task >> file_index_task >> biospecimen_index_task
