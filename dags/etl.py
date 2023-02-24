@@ -71,7 +71,7 @@ with DAG(
     #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
     #     spark_config='enriched-etl',
     #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
-    #3 )
+    #4 )
     with TaskGroup(group_id='index') as index:
         study_index_task = SparkOperator(
             task_id='study_index_task',
@@ -145,17 +145,17 @@ with DAG(
                 arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'file_centric'],
             )
 
-            biospecimen_publish_task = SparkOperator(
-                task_id='biospecimen_publish_task',
-                name='etl-publish-biospecimen-task',
-                k8s_context=K8sContext.DEFAULT,
-                spark_jar=config.spark_publish_jar,
-                spark_class='bio.ferlab.fhir.etl.PublishTask',
-                spark_config='etl-index-task',
-                arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
-            )
+            # biospecimen_publish_task = SparkOperator(
+            #     task_id='biospecimen_publish_task',
+            #     name='etl-publish-biospecimen-task',
+            #     k8s_context=K8sContext.DEFAULT,
+            #     spark_jar=config.spark_publish_jar,
+            #     spark_class='bio.ferlab.fhir.etl.PublishTask',
+            #     spark_config='etl-index-task',
+            #     arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
+            # )
 
-            study_publish_task >> participant_publish_task >> file_publish_task >> biospecimen_publish_task
+            study_publish_task >> participant_publish_task >> file_publish_task
 
         index >> publish
 
