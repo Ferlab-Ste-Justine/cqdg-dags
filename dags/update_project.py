@@ -28,7 +28,7 @@ with DAG(
         cmds=['node',
               '--experimental-modules=node',
               '--es-module-specifier-resolution=node',
-              'dist/admin/run.mjs',
+              'admin/run.mjs',
               project_version(),
               ],
     )
