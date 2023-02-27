@@ -29,14 +29,10 @@ class ArrangerOperator(KubernetesPodOperator):
         self.env_vars = [
             k8s.V1EnvVar(
                 name='NODE_ENV',
-                value='production',
+                value='qa',
             ),
             k8s.V1EnvVar(
-                name='NODE_EXTRA_CA_CERTS',
-                value='/opt/ingress-ca/ca.crt',
-            ),
-            k8s.V1EnvVar(
-                name='SERVICE_ACCOUNT_CLIENT_SECRET',
+                name='KEYCLOAK_CLIENT_SECRET',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
                         name='keycloak-client-system-credentials',
@@ -55,27 +51,6 @@ class ArrangerOperator(KubernetesPodOperator):
                 config_map_ref=k8s.V1ConfigMapEnvSource(
                     name='arranger-es-configs',
                 ),
-            ),
-            k8s.V1EnvFromSource(
-                secret_ref=k8s.V1SecretEnvSource(
-                    name='arranger-session-secret',
-                ),
-            ),
-        ]
-        self.volumes = [
-            k8s.V1Volume(
-                name='ingress-ca-certificate',
-                config_map=k8s.V1ConfigMapVolumeSource(
-                    name=config.ca_certificates,
-                    default_mode=0o555,
-                ),
-            ),
-        ]
-        self.volume_mounts = [
-            k8s.V1VolumeMount(
-                name='ingress-ca-certificate',
-                mount_path='/opt/ingress-ca',
-                read_only=True,
             ),
         ]
 
