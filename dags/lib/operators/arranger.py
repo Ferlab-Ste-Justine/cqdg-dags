@@ -41,11 +41,11 @@ class ArrangerOperator(KubernetesPodOperator):
             ),
         ]
         self.env_from = [
-            k8s.V1EnvFromSource(
-                config_map_ref=k8s.V1ConfigMapEnvSource(
-                    name='arranger-keycloak-configs',
-                ),
-            ),
+            # k8s.V1EnvFromSource(
+            #     config_map_ref=k8s.V1ConfigMapEnvSource(
+            #         name='arranger-keycloak-configs',
+            #     ),
+            # ),
             k8s.V1EnvFromSource(
                 config_map_ref=k8s.V1ConfigMapEnvSource(
                     name='arranger-es-configs',
