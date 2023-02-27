@@ -17,11 +17,10 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'job_type': Param('study_centric', type='string'),
-            # 'env': Param('dev', type='string'),
-            # 'env': Param('qa', enum=['dev', 'qa', 'prd']),
             'project': Param('cqdg', type='string'),
             'es_host': Param('http://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
+            'project_version': Param('v1', type='string'),
         },
 ) as dag:
 
@@ -42,6 +41,9 @@ with DAG(
 
     def es_port() -> str:
         return '{{ params.es_port }}'
+
+    def project_version() -> str:
+        return '{{ params.project_version }}'
 
     # fhavro_export_task = FhavroOperator(
     #     task_id='fhavro-import-task',
@@ -71,7 +73,7 @@ with DAG(
     #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
     #     spark_config='enriched-etl',
     #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
-    #5 )
+    #1 )
     with TaskGroup(group_id='index') as index:
         study_centric = SparkOperator(
             task_id='study_centric',
@@ -157,5 +159,17 @@ with DAG(
 
         study_centric >> participant_centric >> file_centric >> biospecimen_centric
 
-    index >> publish
+    arranger_update_project = ArrangerOperator(
+        task_id='arranger_update_project',
+        name='etl-publish-arranger-update-project',
+        k8s_context=K8sContext.DEFAULT,
+        cmds=['node',
+              '--experimental-modules=node',
+              '--es-module-specifier-resolution=node',
+              'admin/run.mjs',
+              project_version(),
+              ],
+    )
+
+    index >> publish >> arranger_update_project
 
