@@ -6,7 +6,8 @@ from datetime import datetime
 from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.arranger import ArrangerOperator
-# if env in [Env.QA, Env.DEV]:
+
+# if env in [Env.QA, Env.DEV]1:
 
 with DAG(
         dag_id='update_arranger_project',
@@ -16,13 +17,18 @@ with DAG(
             'project_version': Param('v1', type='string'),
         },
 ) as dag:
-
     def project_version() -> str:
         return '{{ params.project_version }}'
+
 
     arranger_remove_project = ArrangerOperator(
         task_id='arranger_update_project',
         name='etl-publish-arranger-update-project',
         k8s_context=K8sContext.DEFAULT,
-        cmds=[project_version()],
+        cmds=['node',
+              '--experimental-modules=node',
+              '--es-module-specifier-resolution=node',
+              'admin/run.mjs',
+              project_version(),
+              ],
     )
