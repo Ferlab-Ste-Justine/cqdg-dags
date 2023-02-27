@@ -9,7 +9,7 @@ from lib.operators.arranger import ArrangerOperator
 # if env in [Env.QA, Env.DEV]:
 
 with DAG(
-        dag_id='etl',
+        dag_id='update_etl',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
