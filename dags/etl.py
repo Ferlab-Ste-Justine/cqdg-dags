@@ -71,7 +71,7 @@ with DAG(
     #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
     #     spark_config='enriched-etl',
     #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
-    #7 )
+    #6 )
     with TaskGroup(group_id='index') as index:
         study_centric = SparkOperator(
             task_id='study_centric',
