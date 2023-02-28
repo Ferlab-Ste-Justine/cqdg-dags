@@ -45,35 +45,6 @@ with DAG(
     def project_version() -> str:
         return '{{ params.project_version }}'
 
-    # fhavro_export_task = FhavroOperator(
-    #     task_id='fhavro-import-task',
-    #     name='etl-fhavro-import-task',
-    #     k8s_context=K8sContext.ETL,
-    #     spark_jar=config.spark_index_jar,
-    #     spark_class='bio.ferlab.fhir.etl.FhavroExport',
-    #     spark_config='enriched-etl',
-    #     arguments=['7', 'ST0000017', 'dev'],
-    # )
-    #
-    # import_task = SparkOperator(
-    #     task_id='import-task',
-    #     name='etl-import-task',
-    #     k8s_context=K8sContext.ETL,
-    #     spark_jar=config.spark_index_jar,
-    #     spark_class='bio.ferlab.fhir.etl.ImportTask',
-    #     spark_config='enriched-etl',
-    #     arguments=['./config/dev-cqdg.conf', 'default', '5', 'STU0000001'],
-    # )
-    #
-    # prepare_index_task = SparkOperator(
-    #     task_id='prepare-index-task',
-    #     name='etl-prepare-index-task',
-    #     k8s_context=K8sContext.ETL,
-    #     spark_jar=config.spark_index_jar,
-    #     spark_class='bio.ferlab.fhir.etl.PrepareIndex',
-    #     spark_config='enriched-etl',
-    #     arguments=['./config/dev-cqdg.conf', 'default', 'participant_centric', '5', 'STU0000001'],
-    #1 )
     with TaskGroup(group_id='index') as index:
         study_centric = SparkOperator(
             task_id='study_centric',
