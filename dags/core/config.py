@@ -6,7 +6,7 @@ from airflow.models import Variable
 class Env:
     QA = 'qa'
     DEV = 'dev'
-    PROD = 'prod'
+    PROD = 'prd'
 
 
 class K8sContext:
