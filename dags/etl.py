@@ -40,7 +40,7 @@ with DAG(
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
             spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'study_centric', env, project(), config.es_url, es_port()],
+            arguments=[release_id(), study_ids(), 'study_centric', env, project(), config.es_url, '9200'],
         )
 
         participant_centric = SparkOperator(
