@@ -134,6 +134,5 @@ with DAG(
               ],
     )
 
-    # index >> publish >> arranger_update_project
-    arranger_update_project
+    index >> publish >> arranger_update_project
 
