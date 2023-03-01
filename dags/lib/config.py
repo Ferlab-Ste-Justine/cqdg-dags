@@ -33,20 +33,20 @@ cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 
 if env == Env.QA:
     es_url = 'http://elasticsearch:9200'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/publish-task.jar'
+    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
+    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.DEV:
     es_url = 'http://elasticsearch:9200'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/publish-task.jar'
+    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
+    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.PROD:
-    es_url = 'http://elasticsearch:9200'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.10/publish-task.jar'
+    es_url = 'https://elasticsearch:9200'
+    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
+    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 else:

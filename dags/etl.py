@@ -7,7 +7,7 @@ from lib.operators.fhavro import FhavroOperator
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
-# if env in [Env.QA, Env.DEV]:
+# if3 env in [Env.QA, Env.DEV]:
 
 with DAG(
         dag_id='etl',
@@ -17,7 +17,7 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'project': Param('cqdg', type='string'),
-            'es_host': Param('http://elasticsearch-workers', type='string'),
+            'es_host': Param('https://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
             'project_version': Param('v1', type='string'),
         },
