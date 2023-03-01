@@ -105,12 +105,12 @@ class SparkOperator(KubernetesPodOperator):
                     secret_name='spark-s3-credentials',
                 ),
             ),
-            k8s.V1Volume(
-                name='es-ca-certificate',
-                secret=k8s.V1SecretVolumeSource(
-                    secret_name='es-ca-certificate',
-                ),
-            ),
+            # k8s.V1Volume(
+            #     name='es-ca-certificate',
+            #     secret=k8s.V1SecretVolumeSource(
+            #         secret_name='es-ca-certificate',
+            #     ),
+            # ),
         ]
         self.volume_mounts = [
             k8s.V1VolumeMount(
@@ -123,11 +123,11 @@ class SparkOperator(KubernetesPodOperator):
                 mount_path='/opt/spark-configs/s3-credentials',
                 read_only=True,
             ),
-            k8s.V1VolumeMount(
-                name='es-ca-certificate',
-                mount_path='/opt/es-ca/ca.pem',
-                read_only=True,
-            ),
+            # k8s.V1VolumeMount(
+            #     name='es-ca-certificate',
+            #     mount_path='/opt/es-ca/ca.pem',
+            #     read_only=True,
+            # ),
         ]
 
         if self.spark_config:

@@ -7,7 +7,7 @@ from lib.operators.fhavro import FhavroOperator
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
-# if1 env in [Env.QA, Env.DEV]:
+# if env in [Env.QA, Env.DEV]:
 
 with DAG(
         dag_id='etl',
