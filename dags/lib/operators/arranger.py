@@ -32,7 +32,7 @@ class ArrangerOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='ES_HOST',
-                value='http://elasticsearch-workers:9200',
+                value="{0}:9200".format(config.es_url),
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_CLIENT_SECRET',
