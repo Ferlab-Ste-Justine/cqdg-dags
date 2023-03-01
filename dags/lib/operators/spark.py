@@ -10,21 +10,19 @@ from lib import config
 from lib.config import env
 from typing import List
 
-from dags.lib.config import Env
-
 
 class SparkOperator(KubernetesPodOperator):
 
     def __init__(
-        self,
-        k8s_context: str,
-        spark_jar: str,
-        spark_class: str,
-        spark_config: str = '',
-        spark_secret: str = '',
-        skip_env: List[str] = [],
-        skip_fail_env: List[str] = [],
-        **kwargs,
+            self,
+            k8s_context: str,
+            spark_jar: str,
+            spark_class: str,
+            spark_config: str = '',
+            spark_secret: str = '',
+            skip_env: List[str] = [],
+            skip_fail_env: List[str] = [],
+            **kwargs,
     ) -> None:
         super().__init__(
             is_delete_operator_pod=False,
@@ -67,6 +65,24 @@ class SparkOperator(KubernetesPodOperator):
                 name='AWS_ENDPOINT',
                 value='https://s3.ops.cqdg.ferlab.bio',
             ),
+            # k8s.V1EnvVar(
+            #     name='AWS_ACCESS_KEY',
+            #     value_from=k8s.V1EnvVarSource(
+            #         secret_key_ref=k8s.V1SecretKeySelector(
+            #             name='s3-fhir-import-credentials',
+            #             key='S3_ACCESS_KEY',
+            #         ),
+            #     ),
+            # ),
+            # k8s.V1EnvVar(
+            #     name='AWS_SECRET_KEY',
+            #     value_from=k8s.V1EnvVarSource(
+            #         secret_key_ref=k8s.V1SecretKeySelector(
+            #             name='s3-fhir-import-credentials',
+            #             key='S3_SECRET_KEY',
+            #         ),
+            #     ),
+            # ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
                 value=self.spark_jar,
@@ -89,18 +105,13 @@ class SparkOperator(KubernetesPodOperator):
                     secret_name='spark-s3-credentials',
                 ),
             ),
+            # k8s.V1Volume(
+            #     name='es-ca-certificate',
+            #     secret=k8s.V1SecretVolumeSource(
+            #         secret_name='es-ca-certificate',
+            #     ),
+            # ),
         ]
-
-        if env in [Env.PROD]:
-            self.volumes.append(
-                k8s.V1Volume(
-                    name='es-ca-certificate',
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name='es-ca-certificate',
-                    ),
-                ),
-            )
-
         self.volume_mounts = [
             k8s.V1VolumeMount(
                 name='spark-defaults',
@@ -112,15 +123,12 @@ class SparkOperator(KubernetesPodOperator):
                 mount_path='/opt/spark-configs/s3-credentials',
                 read_only=True,
             ),
+            # k8s.V1VolumeMount(
+            #     name='es-ca-certificate',
+            #     mount_path='/opt/es-ca/ca.pem',
+            #     read_only=True,
+            # ),
         ]
-        if env in [Env.PROD]:
-            self.volumes.append(
-                k8s.V1VolumeMount(
-                    name='es-ca-certificate',
-                    mount_path='/opt/es-ca/ca.pem',
-                    read_only=True,
-                ),
-            )
 
         if self.spark_config:
             self.volumes.append(
