@@ -8,6 +8,8 @@ from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
 
+# 1
+
 with DAG(
         dag_id='etl',
         start_date=datetime(2022, 1, 1),
@@ -20,21 +22,25 @@ with DAG(
             'project_version': Param('v1', type='string'),
         },
 ) as dag:
-
     def release_id() -> str:
         return '{{ params.release_id }}'
+
 
     def study_ids() -> str:
         return '{{ params.study_ids }}'
 
+
     def project() -> str:
         return '{{ params.project }}'
+
 
     def es_port() -> str:
         return '{{ params.es_port }}'
 
+
     def project_version() -> str:
         return '{{ params.project_version }}'
+
 
     with TaskGroup(group_id='index') as index:
         study_centric = SparkOperator(
@@ -134,4 +140,3 @@ with DAG(
     )
 
     index >> publish >> arranger_update_project
-
