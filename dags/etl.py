@@ -7,7 +7,7 @@ from lib.operators.fhavro import FhavroOperator
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
-# if2 env in [Env.QA, Env.DEV]:
+# if3 env in [Env.QA, Env.DEV]:
 
 with DAG(
         dag_id='etl',
@@ -17,7 +17,6 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'project': Param('cqdg', type='string'),
-            'es_host': Param('https://elasticsearch-workers', type='string'),
             'es_port': Param('9200', type='string'),
             'project_version': Param('v1', type='string'),
         },
@@ -31,9 +30,6 @@ with DAG(
 
     def project() -> str:
         return '{{ params.project }}'
-
-    def es_host() -> str:
-        return '{{ params.es_host }}'
 
     def es_port() -> str:
         return '{{ params.es_port }}'
@@ -49,7 +45,7 @@ with DAG(
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
             spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'study_centric', env, project(), es_host(), es_port()],
+            arguments=[release_id(), study_ids(), 'study_centric', env, project(), config.es_url, es_port()],
         )
 
         participant_centric = SparkOperator(
@@ -59,7 +55,7 @@ with DAG(
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
             spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'participant_centric', env, project(), es_host(), es_port()],
+            arguments=[release_id(), study_ids(), 'participant_centric', env, project(), config.es_url, es_port()],
         )
 
         file_centric = SparkOperator(
@@ -69,7 +65,7 @@ with DAG(
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
             spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'file_centric', env, project(), es_host(), es_port()],
+            arguments=[release_id(), study_ids(), 'file_centric', env, project(), config.es_url, es_port()],
         )
 
         biospecimen_centric = SparkOperator(
@@ -79,7 +75,7 @@ with DAG(
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
             spark_config='etl-index-task',
-            arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), es_host(), es_port()],
+            arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), config.es_url, es_port()],
         )
         study_centric >> participant_centric >> file_centric >> biospecimen_centric
 
@@ -91,7 +87,7 @@ with DAG(
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
             spark_config='etl-index-task',
-            arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'study_centric'],
+            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'study_centric'],
         )
 
         participant_centric = SparkOperator(
@@ -101,7 +97,7 @@ with DAG(
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
             spark_config='etl-index-task',
-            arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'participant_centric'],
+            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'participant_centric'],
         )
 
         file_centric = SparkOperator(
@@ -111,7 +107,7 @@ with DAG(
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
             spark_config='etl-index-task',
-            arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'file_centric'],
+            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'file_centric'],
         )
 
         biospecimen_centric = SparkOperator(
@@ -121,7 +117,7 @@ with DAG(
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
             spark_config='etl-index-task',
-            arguments=[es_host(), es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
+            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
         )
 
         study_centric >> participant_centric >> file_centric >> biospecimen_centric

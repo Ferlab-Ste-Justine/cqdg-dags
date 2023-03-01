@@ -112,6 +112,7 @@ class SparkOperator(KubernetesPodOperator):
             #     ),
             # ),
         ]
+
         self.volume_mounts = [
             k8s.V1VolumeMount(
                 name='spark-defaults',
