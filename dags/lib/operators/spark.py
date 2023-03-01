@@ -173,6 +173,9 @@ class SparkOperator(KubernetesPodOperator):
             field_selector=f'metadata.name={self.pod.metadata.name}-driver',
             limit=1,
         )
+        print("Sleeping")
+        time.sleep(600)
+        print("End Sleeping")
         if driver_pod.items:
             log = k8s_client.read_namespaced_pod_log(
                 name=f'{self.pod.metadata.name}-driver',
