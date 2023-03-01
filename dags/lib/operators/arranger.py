@@ -31,6 +31,10 @@ class ArrangerOperator(KubernetesPodOperator):
                 value='qa',
             ),
             k8s.V1EnvVar(
+                name='ES_HOST',
+                value=config.es_url,
+            ),
+            k8s.V1EnvVar(
                 name='KEYCLOAK_CLIENT_SECRET',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
