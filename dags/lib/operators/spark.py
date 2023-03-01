@@ -163,10 +163,6 @@ class SparkOperator(KubernetesPodOperator):
                 ),
             )
 
-        print("Sleeping")
-        time.sleep(600)
-        print("End Sleeping")
-
         super().execute(**kwargs)
 
         k8s_client = kubernetes.client.CoreV1Api()
