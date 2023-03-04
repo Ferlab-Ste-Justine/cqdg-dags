@@ -118,7 +118,7 @@ class SparkOperator(KubernetesPodOperator):
             self.volume_mounts.append(
                 k8s.V1VolumeMount(
                     name='es-ca-certificate',
-                    mount_path='/opt/es-ca/ca.pem',
+                    mount_path='/opt/es-ca',
                     read_only=True,
                 ),
             )
