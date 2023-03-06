@@ -91,15 +91,15 @@ class SparkOperator(KubernetesPodOperator):
             ),
         ]
 
-        # if env in [Env.PROD]:
-        #     self.volumes.append(
-        #         k8s.V1Volume(
-        #             name='es-ca-certificate',
-        #             secret=k8s.V1SecretVolumeSource(
-        #                 secret_name='es-ca-certificate',
-        #             ),
-        #         ),
-        #     )
+        if env in [Env.PROD]:
+            self.volumes.append(
+                k8s.V1Volume(
+                    name='es-ca-certificate',
+                    secret=k8s.V1SecretVolumeSource(
+                        secret_name='es-ca-certificate',
+                    ),
+                ),
+            )
 
         self.volume_mounts = [
             k8s.V1VolumeMount(
@@ -114,14 +114,14 @@ class SparkOperator(KubernetesPodOperator):
             ),
         ]
 
-        # if env in [Env.PROD]:
-        #     self.volume_mounts.append(
-        #         k8s.V1VolumeMount(
-        #             name='es-ca-certificate',
-        #             mount_path='/opt/es-ca',
-        #             read_only=True,
-        #         ),
-        #     )
+        if env in [Env.PROD]:
+            self.volume_mounts.append(
+                k8s.V1VolumeMount(
+                    name='es-ca-certificate',
+                    mount_path='/opt/es-ca',
+                    read_only=True,
+                ),
+            )
 
         if self.spark_config:
             self.volumes.append(
