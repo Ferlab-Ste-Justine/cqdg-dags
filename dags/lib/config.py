@@ -45,8 +45,8 @@ elif env == Env.DEV:
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.PROD:
     es_url = 'https://elasticsearch-workers'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.32/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.32/publish-task.jar'
+    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.33/index-task.jar'
+    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.33/publish-task.jar'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 else:
