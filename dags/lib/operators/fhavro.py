@@ -13,7 +13,6 @@ class FhavroOperator(KubernetesPodOperator):
         super().__init__(
             is_delete_operator_pod=True,
             in_cluster=config.k8s_in_cluster(k8s_context),
-            config_file=config.k8s_config_file(k8s_context),
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
             image=config.fhavro_export_image,
