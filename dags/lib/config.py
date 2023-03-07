@@ -24,29 +24,36 @@ base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export'
-spark_image = 'ferlabcrsj/spark:afc6bbaf822e884d1c3fd4e98d72a475456d1240'
+fhavro_export_image = 'ferlabcrsj/fhavro-export:e29daadedc701788dc82b2a9be2a64e6af79ab8a-1678142336'
+spark_image = 'ferlabcrsj/spark:3.3.1'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.1.3'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
+jar_version = 'v1.1.11'
 
 
 if env == Env.QA:
     es_url = 'http://elasticsearch-workers'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
+    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
+    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
+    fhir_url = 'https://fhir.qa.cqdg.ferlab.bio'
+    keycloak_url = 'https://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.DEV:
     es_url = 'http://elasticsearch-workers'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
+    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
+    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
+    fhir_url = 'https://fhir.qa.cqdg.ferlab.bio'
+    keycloak_url = 'https://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.PROD:
     es_url = 'https://elasticsearch-workers'
-    spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/index-task.jar'
-    spark_publish_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.1.11/publish-task.jar'
+    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
+    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
+    fhir_url = 'https://fhir.qa.cqdg.ferlab.bio'
+    keycloak_url = 'https://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 else:

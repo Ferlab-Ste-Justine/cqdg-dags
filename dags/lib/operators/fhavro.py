@@ -28,36 +28,30 @@ class FhavroOperator(KubernetesPodOperator):
         ]
         self.env_vars = [
             k8s.V1EnvVar(
-                name='AWS_ACCESS_KEY_ID',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='download-s3-credentials',
-                        key='S3_ACCESS_KEY',
-                    ),
-                ),
-            ),
-
-            k8s.V1EnvVar(
                 name='AWS_ENDPOINT',
+                value='https://s3.ops.cqdg.ferlab.bio',
+            ),
+            k8s.V1EnvVar(
+                name='AWS_ACCESS_KEY',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
-                        name='download-s3-credentials',
+                        name='s3-fhir-import-credentials',
                         key='S3_ACCESS_KEY',
                     ),
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_SECRET_ACCESS_KEY',
+                name='AWS_SECRET_KEY',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
-                        name='download-s3-credentials',
-                        key='S3_ACCESS_KEY',
+                        name='s3-fhir-import-credentials',
+                        key='S3_SECRET_KEY',
                     ),
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_DEFAULT_REGION',
-                value='regionone',
+                name='AWS_REGION',
+                value='us-east-1',
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_CLIENT_SECRET',
@@ -70,12 +64,11 @@ class FhavroOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_URL',
-                value='https://auth' + env_url('.') +
-                      '.cqdg.ferlab.bio/auth',
+                value=config.keycloak_url,
             ),
             k8s.V1EnvVar(
                 name='FHIR_URL',
-                value='http://localhost:8080/fhir',
+                value=config.fhir_url,
             ),
             k8s.V1EnvVar(
                 name='AWS_PATH_ACCESS_STYLE',
