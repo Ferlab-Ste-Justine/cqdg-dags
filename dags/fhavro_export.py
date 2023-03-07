@@ -8,7 +8,7 @@ from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
 
-#7
+#9
 
 with DAG(
         dag_id='fhavro_export',
