@@ -24,12 +24,12 @@ base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export:2beb7715fb26904f2a1c252dddd184a0459aca3c-1678216229'
+fhavro_export_image = 'ferlabcrsj/fhavro-export:a329e048d416c5c9b94cdf9936d92b6ce8540db8-1678223762'
 spark_image = 'ferlabcrsj/spark:3.3.1'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.1.3'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
-jar_version = 'v1.1.13'
+jar_version = 'v1.1.14'
 
 
 if env == Env.QA:
