@@ -37,7 +37,7 @@ if env == Env.QA:
     spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
     spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
     fhir_url = 'https://fhir.qa.cqdg.ferlab.bio/fhir'
-    keycloak_url = 'http://keycloak-http/auth'
+    keycloak_url = 'https://auth.qa.cqdg.ferlab.bio/auth'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.DEV:
