@@ -24,7 +24,7 @@ base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export:e29daadedc701788dc82b2a9be2a64e6af79ab8a-1678142336'
+fhavro_export_image = 'ferlabcrsj/fhavro-export:6cfd2da11bc98ba2017d5093606592b2a3de9b34-1678214674'
 spark_image = 'ferlabcrsj/spark:3.3.1'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.1.3'
 spark_service_account = 'spark'
