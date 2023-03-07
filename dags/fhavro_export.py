@@ -37,7 +37,7 @@ with DAG(
         cmds=['java',
               '-cp',
               'fhavro-export.jar',
-              'bio/ferlab/fhir/etl/FhirExport',
+              'bio/ferlab/fhir/etl/FhavroExport',
               release_id(), study_ids(), env
               ],
     )
