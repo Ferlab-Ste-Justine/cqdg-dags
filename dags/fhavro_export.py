@@ -31,8 +31,8 @@ with DAG(
 
 
     fhavro_export = FhavroOperator(
-        task_id='fhir_import',
-        name='etl-fhir_import',
+        task_id='fhavro_export',
+        name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
         cmds=['java',
               '-cp',

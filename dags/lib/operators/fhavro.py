@@ -75,21 +75,21 @@ class FhavroOperator(KubernetesPodOperator):
             ),
 
         ]
-        self.volumes = [
-            k8s.V1Volume(
-                name='minio-ca-certificate',
-                config_map=k8s.V1ConfigMapVolumeSource(
-                    name=config.minio_certificate,
-                    default_mode=0o555,
-                ),
-            ),
-        ]
-        self.volume_mounts = [
-            k8s.V1VolumeMount(
-                name='minio-ca-certificate',
-                mount_path='/opt/minio-ca',
-                read_only=True,
-            ),
-        ]
+        # self.volumes = [
+        #     k8s.V1Volume(
+        #         name='minio-ca-certificate',
+        #         config_map=k8s.V1ConfigMapVolumeSource(
+        #             name=config.minio_certificate,
+        #             default_mode=0o555,
+        #         ),
+        #     ),
+        # ]
+        # self.volume_mounts = [
+        #     k8s.V1VolumeMount(
+        #         name='minio-ca-certificate',
+        #         mount_path='/opt/minio-ca',
+        #         read_only=True,
+        #     ),
+        # ]
 
         super().execute(**kwargs)
