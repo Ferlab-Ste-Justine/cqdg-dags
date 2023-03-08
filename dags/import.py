@@ -42,5 +42,5 @@ with DAG(
         spark_jar=config.spark_import_jar,
         spark_class='bio.ferlab.fhir.etl.ImportTask',
         spark_config='etl-index-task',
-        arguments=['./config/dev-cqdg.conf', 'default', release_id(), study_ids()],
+        arguments=[f'config/{env}-{project()}.conf', 'default', release_id(), study_ids()],
     )
