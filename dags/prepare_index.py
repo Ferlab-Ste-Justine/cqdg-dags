@@ -2,13 +2,11 @@ from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
 from lib import config
-from lib.config import env, Env, K8sContext
+from lib.config import env, K8sContext
 from lib.operators.spark import SparkOperator
 
-# 6
-
 with DAG(
-        dag_id='import',
+        dag_id='prepare_index',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
@@ -27,12 +25,12 @@ with DAG(
     def project() -> str:
         return '{{ params.project }}'
 
-    import_task = SparkOperator(
-        task_id='import_task',
-        name='etl-import-task',
+    prepare_index = SparkOperator(
+        task_id='prepare_index',
+        name='etl-prepare-index',
         k8s_context=K8sContext.DEFAULT,
-        spark_jar=config.spark_import_jar,
-        spark_class='bio.ferlab.fhir.etl.ImportTask',
+        spark_jar=config.spark_prepare_index_jar,
+        spark_class='bio.ferlab.fhir.etl.PrepareIndex',
         spark_config='etl-index-task',
-        arguments=[f'config/{env}-{project()}.conf', 'default', release_id(), study_ids()],
+        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', release_id(), study_ids()],
     )
