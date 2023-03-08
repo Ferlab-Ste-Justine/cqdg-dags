@@ -31,7 +31,7 @@ class FhavroOperator(KubernetesPodOperator):
                 value='https://s3.ops.cqdg.ferlab.bio',
             ),
             k8s.V1EnvVar(
-                name='AWS_ACCESS_KEY',
+                name='AWS_ACCESS_KEY_ID',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
                         name='s3-fhir-import-credentials',
@@ -40,7 +40,7 @@ class FhavroOperator(KubernetesPodOperator):
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_SECRET_KEY',
+                name='AWS_SECRET_ACCESS_KEY',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
                         name='s3-fhir-import-credentials',
