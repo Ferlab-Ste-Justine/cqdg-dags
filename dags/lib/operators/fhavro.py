@@ -1,7 +1,6 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 from lib import config
-from lib.config import env_url
 
 class FhavroOperator(KubernetesPodOperator):
 
@@ -11,7 +10,7 @@ class FhavroOperator(KubernetesPodOperator):
         **kwargs,
     ) -> None:
         super().__init__(
-            is_delete_operator_pod=False,
+            is_delete_operator_pod=True,
             in_cluster=config.k8s_in_cluster(k8s_context),
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
@@ -75,21 +74,5 @@ class FhavroOperator(KubernetesPodOperator):
             ),
 
         ]
-        # self.volumes = [
-        #     k8s.V1Volume(
-        #         name='minio-ca-certificate',
-        #         config_map=k8s.V1ConfigMapVolumeSource(
-        #             name=config.minio_certificate,
-        #             default_mode=0o555,
-        #         ),
-        #     ),
-        # ]
-        # self.volume_mounts = [
-        #     k8s.V1VolumeMount(
-        #         name='minio-ca-certificate',
-        #         mount_path='/opt/minio-ca',
-        #         read_only=True,
-        #     ),
-        # ]
 
         super().execute(**kwargs)
