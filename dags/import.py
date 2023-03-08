@@ -8,7 +8,7 @@ from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
 
-# 2
+# 3
 
 with DAG(
         dag_id='import',
@@ -18,7 +18,6 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'project': Param('cqdg', type='string'),
-            'project_version': Param('v1', type='string'),
         },
 ) as dag:
     def release_id() -> str:
@@ -31,9 +30,6 @@ with DAG(
 
     def project() -> str:
         return '{{ params.project }}'
-
-    def project_version() -> str:
-        return '{{ params.project_version }}'
 
     import_task = SparkOperator(
         task_id='import_task',
