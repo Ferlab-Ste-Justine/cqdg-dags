@@ -1,6 +1,9 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 from lib import config
+from lib.config import env
+
+from dags.lib.config import Env
 
 
 class ArrangerOperator(KubernetesPodOperator):
@@ -27,34 +30,46 @@ class ArrangerOperator(KubernetesPodOperator):
         ]
         self.env_vars = [
             k8s.V1EnvVar(
-                name='NODE_ENV',
-                value='qa',
-            ),
-            k8s.V1EnvVar(
                 name='ES_HOST',
                 value="{0}:9200".format(config.es_url),
             ),
-            k8s.V1EnvVar(
-                name='KEYCLOAK_CLIENT_SECRET',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='keycloak-client-system-credentials',
-                        key='client-secret',
+        ]
+
+        if env in [Env.PROD]:
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='NODE_ENV',
+                    value='production',
+                )
+            )
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='KEYCLOAK_CLIENT_SECRET',
+                    value_from=k8s.V1EnvVarSource(
+                        secret_key_ref=k8s.V1SecretKeySelector(
+                            name='arranger-keycloak-credentials',
+                            key='SERVICE_ACCOUNT_CLIENT_SECRET',
+                        ),
                     ),
-                ),
-            ),
-        ]
-        self.env_from = [
-            # k8s.V1EnvFromSource(
-            #     config_map_ref=k8s.V1ConfigMapEnvSource(
-            #         name='arranger-keycloak-configs',
-            #     ),
-            # ),
-            # k8s.V1EnvFromSource(
-            #     config_map_ref=k8s.V1ConfigMapEnvSource(
-            #         name='arranger-es-configs',
-            #     ),
-            # ),
-        ]
+                )
+            )
+        else:
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='NODE_ENV',
+                    value='qa',
+                )
+            )
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='KEYCLOAK_CLIENT_SECRET',
+                    value_from=k8s.V1EnvVarSource(
+                        secret_key_ref=k8s.V1SecretKeySelector(
+                            name='keycloak-client-system-credentials',
+                            key='client-secret',
+                        ),
+                    ),
+                )
+            )
 
         super().execute(**kwargs)
