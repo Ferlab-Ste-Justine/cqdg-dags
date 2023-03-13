@@ -14,7 +14,7 @@ class ArrangerOperator(KubernetesPodOperator):
         **kwargs,
     ) -> None:
         super().__init__(
-            is_delete_operator_pod=True,
+            is_delete_operator_pod=False,
             in_cluster=config.k8s_in_cluster(k8s_context),
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
