@@ -33,6 +33,10 @@ class ArrangerOperator(KubernetesPodOperator):
                 name='ES_HOST',
                 value="{0}:9200".format(config.es_url),
             ),
+            k8s.V1EnvVar(
+                name='NODE_EXTRA_CA_CERTS',
+                value='/opt/es-ca/ca.crt',
+            ),
         ]
 
         self.volumes = []
