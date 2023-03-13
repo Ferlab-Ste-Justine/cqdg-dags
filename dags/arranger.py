@@ -3,12 +3,10 @@ from airflow.models.param import Param
 from airflow.utils.task_group import TaskGroup
 from datetime import datetime
 from lib import config
-from lib.operators.fhavro import FhavroOperator
 from lib.config import env, Env, K8sContext
-from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
 
-#3
+#4
 
 with DAG(
         dag_id='update_arranger_project',
