@@ -42,7 +42,7 @@ elif env == Env.DEV:
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.PROD:
-    es_url = 'http://elasticsearch:9200'
+    es_url = 'https://elasticsearch'
     spark_index_jar = 'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/v1.0.1/index-task.jar'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'

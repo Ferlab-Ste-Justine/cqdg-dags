@@ -8,18 +8,14 @@ from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
 
+#1
 
 with DAG(
         dag_id='update_arranger_project',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'release_id': Param('7', type='string'),
-            'study_ids': Param('ST0000017', type='string'),
-            'project': Param('cqdg', type='string'),
-            'es_port': Param('9200', type='string'),
             'project_version': Param('v1', type='string'),
-            'test': Param('false', type='string'),
         },
 ) as dag:
     def project_version() -> str:
