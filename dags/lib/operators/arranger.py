@@ -35,6 +35,7 @@ class ArrangerOperator(KubernetesPodOperator):
             ),
         ]
 
+        self.volumes = []
         self.volume_mounts = []
 
         if env in [Env.PROD]:
@@ -54,6 +55,14 @@ class ArrangerOperator(KubernetesPodOperator):
                         ),
                     ),
                 )
+            )
+            self.volumes.append(
+                k8s.V1Volume(
+                    name='es-ca-certificate',
+                    secret=k8s.V1SecretVolumeSource(
+                        secret_name='es-ca-certificate',
+                    ),
+                ),
             )
             self.volume_mounts.append(
                 k8s.V1VolumeMount(

@@ -6,7 +6,7 @@ from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.arranger import ArrangerOperator
 
-#11
+#12
 
 with DAG(
         dag_id='update_arranger_project',
