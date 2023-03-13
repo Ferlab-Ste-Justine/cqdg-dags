@@ -63,9 +63,9 @@ class ArrangerOperator(KubernetesPodOperator):
             self.volumes.append(
                 k8s.V1Volume(
                     name='es-ca-certificate',
-                    config_map=k8s.V1ConfigMapVolumeSource(
-                        name='es-ca-certificate',
-                        default_mode=0o555,
+                    secret=k8s.V1SecretVolumeSource(
+                        secret_name='es-ca-certificate',
+                        default_mode=0o555
                     ),
                 ),
             )
