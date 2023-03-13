@@ -53,6 +53,13 @@ class ArrangerOperator(KubernetesPodOperator):
                     ),
                 )
             )
+            self.volume_mounts.append(
+                k8s.V1VolumeMount(
+                    name='es-ca-certificate',
+                    mount_path='/opt/es-ca',
+                    read_only=True,
+                ),
+            )
         else:
             self.env_vars.append(
                 k8s.V1EnvVar(
