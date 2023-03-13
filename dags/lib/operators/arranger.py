@@ -35,7 +35,7 @@ class ArrangerOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='NODE_EXTRA_CA_CERTS',
-                value='/opt/es-ca/ca.crt',
+                value='/opt/es-ca/ca.pem',
             ),
         ]
 
@@ -63,8 +63,9 @@ class ArrangerOperator(KubernetesPodOperator):
             self.volumes.append(
                 k8s.V1Volume(
                     name='es-ca-certificate',
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name='es-ca-certificate',
+                    config_map=k8s.V1ConfigMapVolumeSource(
+                        name='es-ca-certificate',
+                        default_mode=0o555,
                     ),
                 ),
             )
