@@ -1,7 +1,7 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 from lib import config
-# from lib.config import env
+from lib.config import env
 
 from dags.lib.config import Env
 
