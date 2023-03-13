@@ -53,23 +53,23 @@ class ArrangerOperator(KubernetesPodOperator):
                     ),
                 )
             )
-        # else:
-        #     self.env_vars.append(
-        #         k8s.V1EnvVar(
-        #             name='NODE_ENV',
-        #             value='qa',
-        #         )
-        #     )
-        #     self.env_vars.append(
-        #         k8s.V1EnvVar(
-        #             name='KEYCLOAK_CLIENT_SECRET',
-        #             value_from=k8s.V1EnvVarSource(
-        #                 secret_key_ref=k8s.V1SecretKeySelector(
-        #                     name='keycloak-client-system-credentials',
-        #                     key='client-secret',
-        #                 ),
-        #             ),
-        #         )
-        #     )
+        else:
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='NODE_ENV',
+                    value='qa',
+                )
+            )
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='KEYCLOAK_CLIENT_SECRET',
+                    value_from=k8s.V1EnvVarSource(
+                        secret_key_ref=k8s.V1SecretKeySelector(
+                            name='keycloak-client-system-credentials',
+                            key='client-secret',
+                        ),
+                    ),
+                )
+            )
 
         super().execute(**kwargs)
