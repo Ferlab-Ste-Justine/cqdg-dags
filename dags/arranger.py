@@ -6,8 +6,6 @@ from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.arranger import ArrangerOperator
 
-#15
-
 with DAG(
         dag_id='update_arranger_project',
         start_date=datetime(2022, 1, 1),
