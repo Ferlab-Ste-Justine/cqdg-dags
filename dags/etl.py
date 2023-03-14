@@ -131,16 +131,16 @@ with DAG(
 
         study_centric >> participant_centric >> file_centric >> biospecimen_centric
 
-    arranger_update_project = ArrangerOperator(
-        task_id='arranger_update_project',
-        name='etl-publish-arranger-update-project',
-        k8s_context=K8sContext.DEFAULT,
-        cmds=['node',
-              '--experimental-modules=node',
-              '--es-module-specifier-resolution=node',
-              'admin/run.mjs',
-              project_version(),
-              ],
-    )
+    # arranger_update_project = ArrangerOperator(
+    #     task_id='arranger_update_project',
+    #     name='etl-publish-arranger-update-project',
+    #     k8s_context=K8sContext.DEFAULT,
+    #     cmds=['node',
+    #           '--experimental-modules=node',
+    #           '--es-module-specifier-resolution=node',
+    #           'admin/run.mjs',
+    #           project_version(),
+    #           ],
+    # )
 
     index >> publish #>> arranger_update_project
