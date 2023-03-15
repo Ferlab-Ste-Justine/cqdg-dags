@@ -5,8 +5,6 @@ from lib import config
 from lib.config import env, K8sContext
 from lib.operators.spark import SparkOperator
 
-#2
-
 with DAG(
         dag_id='prepare_index',
         start_date=datetime(2022, 1, 1),

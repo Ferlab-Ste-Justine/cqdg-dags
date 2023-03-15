@@ -5,8 +5,6 @@ from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 
-# 7
-
 with DAG(
         dag_id='import',
         start_date=datetime(2022, 1, 1),
