@@ -43,6 +43,37 @@ with DAG(
     def test() -> str:
         return '{{ params.test }}'
 
+    fhavro_export = FhavroOperator(
+        task_id='fhavro_export',
+        name='etl-fhavro_export',
+        k8s_context=K8sContext.DEFAULT,
+        cmds=['java',
+              '-cp',
+              'fhavro-export.jar',
+              'bio/ferlab/fhir/etl/FhavroExport',
+              release_id(), study_ids(), env
+              ],
+    )
+
+    import_task = SparkOperator(
+        task_id='import_task',
+        name='etl-import-task',
+        k8s_context=K8sContext.DEFAULT,
+        spark_jar=config.spark_import_jar,
+        spark_class='bio.ferlab.fhir.etl.ImportTask',
+        spark_config='etl-index-task',
+        arguments=[f'config/{env}-{project()}.conf', 'default', release_id(), study_ids()],
+    )
+
+    prepare_index = SparkOperator(
+        task_id='prepare_index',
+        name='etl-prepare-index',
+        k8s_context=K8sContext.DEFAULT,
+        spark_jar=config.spark_prepare_index_jar,
+        spark_class='bio.ferlab.fhir.etl.PrepareIndex',
+        spark_config='etl-index-task',
+        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', release_id(), study_ids()],
+    )
 
     with TaskGroup(group_id='index') as index:
         study_centric = SparkOperator(
@@ -141,4 +172,4 @@ with DAG(
               ],
     )
 
-    index >> publish >> arranger_update_project
+    fhavro_export >> import_task >> prepare_index >> index >> publish >> arranger_update_project
