@@ -3,8 +3,6 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from dags.lib.operators.fhir import FhirOperator
-from dags.lib.operators.wait import WaitOperator
 from lib.config import K8sContext
 from lib.operators.fhir_import import FhirCsvOperator
 
@@ -44,17 +42,6 @@ with DAG(
     def run_names() -> str:
         return '{{ run_names.prefix }}'
 
-    ig_publish = FhirOperator(
-        task_id='ig_publish',
-        name='etl-import-fhir-ig-publish',
-        k8s_context=K8sContext.DEFAULT,
-    )
-
-    wait_30s = WaitOperator(
-        task_id='wait_30s',
-        time='30s',
-    )
-
     csv_import = FhirCsvOperator(
         task_id='fhir_import',
         name='etl-fhir_import',
@@ -62,5 +49,3 @@ with DAG(
         arguments=["-cp", "cqdg-fhir-import.jar", "bio/ferlab/cqdg/etl/FhirImport",
                    prefix(), bucket(), version(), release(), study(), "true", run_names()],
     )
-
-    ig_publish >> wait_30s >> csv_import
