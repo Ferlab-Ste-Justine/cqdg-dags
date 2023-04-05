@@ -28,19 +28,19 @@ with DAG(
         return '{{ params.prefix }}'
 
     def bucket() -> str:
-        return '{{ bucket.prefix }}'
+        return '{{ params.bucket }}'
 
     def version() -> str:
-        return '{{ version.prefix }}'
+        return '{{ params.version }}'
 
     def release() -> str:
-        return '{{ release.prefix }}'
+        return '{{ params.release }}'
 
     def study() -> str:
-        return '{{ study.prefix }}'
+        return '{{ params.study }}'
 
     def run_names() -> str:
-        return '{{ run_names.prefix }}'
+        return '{{ params.run_names }}'
 
     csv_import = FhirCsvOperator(
         task_id='fhir_import',
