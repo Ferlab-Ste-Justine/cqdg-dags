@@ -16,8 +16,7 @@ with DAG(
             'release_id': Param('7', type='string'),
             'study_ids': Param('ST0000017', type='string'),
             'project': Param('cqdg', type='string'),
-            'es_port': Param('9200', type='string'),
-            'project_version': Param('v1', type='string')
+            'es_port': Param('9200', type='string')
         },
 ) as dag:
     def release_id() -> str:
@@ -34,10 +33,6 @@ with DAG(
 
     def es_port() -> str:
         return '{{ params.es_port }}'
-
-
-    def project_version() -> str:
-        return '{{ params.project_version }}'
 
 
     fhavro_export = FhavroOperator(
@@ -164,8 +159,7 @@ with DAG(
         cmds=['node',
               '--experimental-modules=node',
               '--es-module-specifier-resolution=node',
-              'admin/run.mjs',
-              project_version(),
+              'admin/run.mjs'
               ],
     )
 
