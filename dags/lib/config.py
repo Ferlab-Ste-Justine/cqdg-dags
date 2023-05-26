@@ -29,7 +29,7 @@ spark_image = 'ferlabcrsj/spark:3.3.1'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.1.6'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
-jar_version = 'v1.1.15'
+jar_version = 'v1.1.16'
 
 
 if env == Env.QA:
