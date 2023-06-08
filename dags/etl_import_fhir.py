@@ -6,6 +6,7 @@ from airflow.models.param import Param
 from lib.config import K8sContext
 from lib.operators.fhir_import import FhirCsvOperator
 
+# 1
 with DAG(
     dag_id='etl_import_fhir',
     start_date=datetime(2022, 1, 1),
