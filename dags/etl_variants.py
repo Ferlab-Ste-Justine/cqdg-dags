@@ -29,7 +29,7 @@ with DAG(
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.normalize.Normalize',
         spark_config='etl-index-task',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'snv', study_id],
+        arguments=[f'config/{env}-{project()}.conf', 'default', 'snv', study_id()],
     )
 
     variant_task_consequences = SparkOperator(
@@ -39,5 +39,5 @@ with DAG(
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.normalize.Normalize',
         spark_config='etl-index-task',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'consequences', study_id],
+        arguments=[f'config/{env}-{project()}.conf', 'default', 'consequences', study_id()],
     )
