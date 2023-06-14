@@ -41,3 +41,6 @@ with DAG(
         spark_config='etl-index-task',
         arguments=[f'config/{env}-{project()}.conf', 'default', 'consequences', study_id()],
     )
+
+
+variant_task_snv >> variant_task_consequences
