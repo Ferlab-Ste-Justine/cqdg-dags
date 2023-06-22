@@ -2,7 +2,7 @@ from airflow import DAG
 from datetime import datetime
 from airflow.operators.bash import BashOperator
 
-#1
+#2
 with DAG(
         dag_id='test_bash',
         start_date=datetime(2022, 1, 1),
