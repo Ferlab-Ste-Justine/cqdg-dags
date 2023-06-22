@@ -11,5 +11,5 @@ with DAG(
 
     test_bash = BashOperator(
         task_id='test_bash',
-        bash_command="utils/es_mapping_import.sh"
+        bash_command="util/es_mapping_import.sh"
     )
