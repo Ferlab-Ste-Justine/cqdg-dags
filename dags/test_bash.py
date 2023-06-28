@@ -24,7 +24,8 @@ with DAG(
         echo Setting MC alias to this minio: $AWS_ENDPOINT
         mc alias set myminio $1 $2 $3 $4
         
-        apt-get install wget
+        sudo apt-get install
+        sudo apt-get install wget
         
         mkdir templates
         
