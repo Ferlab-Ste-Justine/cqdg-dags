@@ -23,7 +23,7 @@ with DAG(
         
         echo Setting MC alias to this minio: $AWS_ENDPOINT
         echo Downloading templates ...
-        apt-get install
+        apt -v
 
         
     """
@@ -31,7 +31,7 @@ with DAG(
     test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
-        image="minio/mc",
+        image="ubuntu:14.04",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
         arguments=[script],
