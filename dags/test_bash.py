@@ -17,12 +17,11 @@ with DAG(
     """
 
 
-    test_bash = KubernetesPodOperator(
+    test_bash = FileImportOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         image="debian",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
         arguments=[toto],
-        namespace=config.k8s_namespace,
     )
