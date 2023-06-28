@@ -21,6 +21,7 @@ with DAG(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         image="bash",
+        is_delete_operator_pod=False,
         cmds=["bash", "-c"],
         arguments=[
             "bash",
