@@ -21,7 +21,7 @@ with DAG(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
-        image="bash",
+        # image="bash",
         cmds=["bash", "-c"],
         arguments=[
             "bash",
