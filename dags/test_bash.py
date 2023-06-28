@@ -8,9 +8,16 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
 ) as dag:
+
+    toto = """
+    #!/bin/bash
+    echo Setting MC alias to this minio: $AWS_ENDPOINT
+    """
+
+
     test_bash = FileImportOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
-        cmds=[f'util/es_mapping_import.sh $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY qa'],
+        cmds=[toto],
     )
