@@ -26,7 +26,7 @@ with DAG(
         arguments=[
             "bash",
             "-c",
-            "echo Setting MC",
+            toto,
         ],
         namespace=config.k8s_namespace,
     )
