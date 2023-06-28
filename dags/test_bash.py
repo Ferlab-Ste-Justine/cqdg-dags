@@ -23,6 +23,6 @@ with DAG(
         image="debian",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
-        arguments=[toto, "10"],
+        arguments=[toto],
         namespace=config.k8s_namespace,
     )
