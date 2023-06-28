@@ -13,7 +13,7 @@ with DAG(
 
     toto = """
     #!/bin/bash
-    echo Setting MC alias to this minio: $AWS_ENDPOINT
+    echo Setting MC alias to this minio:
     """
 
 
@@ -23,6 +23,6 @@ with DAG(
         image="debian",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
-        arguments=["echo ww", "10"],
+        arguments=[toto, "10"],
         namespace=config.k8s_namespace,
     )
