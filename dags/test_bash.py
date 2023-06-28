@@ -19,5 +19,5 @@ with DAG(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
-        cmds=[toto],
+        cmds=['echo Setting MC alias to this minio: $AWS_ENDPOINT'],
     )
