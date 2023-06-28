@@ -13,7 +13,7 @@ with DAG(
 ) as dag:
     toto = """
     #!/bin/bash
-    echo Setting MC alias to this minio:
+    echo Setting MC alias to this minio: $AWS_ENDPOINT
     """
 
     test_bash = KubernetesPodOperator(
