@@ -31,10 +31,10 @@ with DAG(
         mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
         
         echo Copy templates ...
-        mc cp ./templates/template_study_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_study_centric.json
-        mc cp ./templates/template_file_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_file_centric.json
-        mc cp ./templates/template_participant_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_participant_centric.json
-        mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_biospecimen_centric.json
+        mc cp ./templates/template_study_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_study_centric.json
+        mc cp ./templates/template_file_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_file_centric.json
+        mc cp ./templates/template_participant_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_participant_centric.json
+        mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_biospecimen_centric.json
         
     """
 
