@@ -13,7 +13,7 @@ with DAG(
 
     toto = """
     #!/bin/bash
-    echo Setting MC alias to this minio: $AWS_ENDPOINT
+    ech Setting MC alias to this minio: $AWS_ENDPOINT
     """
 
 
