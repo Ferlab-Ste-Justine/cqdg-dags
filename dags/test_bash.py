@@ -23,8 +23,7 @@ with DAG(
         
         echo Setting MC alias to this minio: $AWS_ENDPOINT
         echo Downloading templates ...
-        apt -v
-        mc --help
+        curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
 
         
     """
@@ -32,7 +31,7 @@ with DAG(
     test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
-        image="ubuntu:14.04",
+        image="minio/mc",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
         arguments=[script],
