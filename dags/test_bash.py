@@ -20,9 +20,9 @@ with DAG(
     test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
-        image="bash",
+        image="debian",
         is_delete_operator_pod=False,
-        cmds=["/bin/bash", "-c"],
-        arguments=["echo hello && echo goodbye"],
+        cmds=["bash", "-cx"],
+        arguments=["echo", "10"],
         namespace=config.k8s_namespace,
     )
