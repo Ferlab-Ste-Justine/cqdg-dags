@@ -42,7 +42,7 @@ with DAG(
     test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
-        image="debian",
+        image="minio/mc",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
         arguments=[script],
