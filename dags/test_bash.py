@@ -13,7 +13,7 @@ with DAG(
 
     toto = """
     #!/bin/bash
-    ech Setting MC alias to this minio: $AWS_ENDPOINT
+    echo Setting MC alias to this minio: $AWS_ENDPOINT
     """
 
 
@@ -22,11 +22,7 @@ with DAG(
         name='etl-fhavro_export',
         image="bash",
         is_delete_operator_pod=False,
-        cmds=["bash", "-c"],
-        arguments=[
-            "bash",
-            "-c",
-            toto,
-        ],
+        cmds=["/bin/bash", "-c"],
+        arguments=["echo hello && echo goodbye"],
         namespace=config.k8s_namespace,
     )
