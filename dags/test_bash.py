@@ -25,7 +25,7 @@ with DAG(
         echo Downloading templates ...
         mkdir templates
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
-
+        ls
         
     """
 
