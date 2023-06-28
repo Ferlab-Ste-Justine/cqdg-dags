@@ -14,7 +14,6 @@ class FileImportOperator(KubernetesPodOperator):
             cluster_context=config.k8s_cluster_context(k8s_context),
             namespace=config.k8s_namespace,
             image=config.fhavro_export_image,
-            cmds=['util/es_mapping_import.sh $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY'],
             **kwargs,
         )
 
