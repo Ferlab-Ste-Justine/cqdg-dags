@@ -22,10 +22,9 @@ with DAG(
         export PATH=$PATH:$HOME/minio-binaries/
         
         echo Setting MC alias to this minio: $AWS_ENDPOINT
-        mc alias set myminio $1 $2 $3 $4
         
-        sudo apt-get install
-        sudo apt-get install wget
+        mc --help
+        mc alias set myminio $1 $2 $3 $4
         
         mkdir templates
         
@@ -45,7 +44,7 @@ with DAG(
     test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
-        image="minio/mc",
+        image="debian",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
         arguments=[script],
