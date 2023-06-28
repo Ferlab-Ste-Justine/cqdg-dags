@@ -29,7 +29,12 @@ with DAG(
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_participant_centric.json --output ./templates/template_participant_centric.json
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
         mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
-        ls
+        
+        echo Copy templates ...
+        mc cp ./templates/template_study_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_study_centric.json
+        mc cp ./templates/template_file_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_file_centric.json
+        mc cp ./templates/template_participant_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_participant_centric.json
+        mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-"$4"-app-clinical-data-service/templates/template_biospecimen_centric.json
         
     """
 
