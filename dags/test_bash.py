@@ -12,5 +12,5 @@ with DAG(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
-        cmds=[f'util/es_mapping_import.sh $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY {Env}'],
+        cmds=[f'util/es_mapping_import.sh $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY qa'],
     )
