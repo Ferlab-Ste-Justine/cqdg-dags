@@ -23,7 +23,7 @@ with DAG(
         
         echo Setting MC alias to this minio: $AWS_ENDPOINT
         echo Downloading templates ...
-        sudo apt-get install
+        apt-get install
 
         
     """
