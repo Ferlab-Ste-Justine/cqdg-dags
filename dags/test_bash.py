@@ -1,5 +1,7 @@
 from airflow import DAG
 from datetime import datetime
+from lib.operators.run_import_minio import FileImportOperator
+# from lib.operators.fhavro import
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from lib.config import Env, K8sContext
 
@@ -15,13 +17,7 @@ with DAG(
     """
 
 
-    # test_bash = FileImportOperator(
-    #     task_id='fhavro_export',
-    #     name='etl-fhavro_export',
-    #     k8s_context=K8sContext.DEFAULT,
-    #     cmds=['echo Setting MC alias to this minio'],
-    # )
-    test_bash = KubernetesPodOperator(
+    test_bash = FileImportOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
@@ -30,6 +26,6 @@ with DAG(
         arguments=[
             "bash",
             "-c",
-            "echo Setting MC alias to this minio: $AWS_ENDPOINT",
+            "echo Setting MC",
         ],
     )
