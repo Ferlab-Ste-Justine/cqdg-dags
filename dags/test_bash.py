@@ -17,7 +17,7 @@ with DAG(
     """
 
 
-    test_bash = FileImportOperator(
+    test_bash = KubernetesPodOperator(
         task_id='fhavro_export',
         name='etl-fhavro_export',
         k8s_context=K8sContext.DEFAULT,
