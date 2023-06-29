@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 
@@ -28,11 +25,11 @@ script = f"""
     mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_biospecimen_centric.json     
 """
 
-test_bash = KubernetesPodOperator(
-    task_id='es-templates-update',
+es_templates_update = KubernetesPodOperator(
+    task_id='es_templates_update',
     name='es-templates-update',
     image="minio/mc",
-    is_delete_operator_pod=False,
+    is_delete_operator_pod=True,
     cmds=["bash", "-cx"],
     arguments=[script],
     namespace=config.k8s_namespace,
