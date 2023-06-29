@@ -4,9 +4,10 @@ from airflow.utils.task_group import TaskGroup
 from datetime import datetime
 from lib import config
 from lib.operators.fhavro import FhavroOperator
-from lib.config import env, Env, K8sContext
+from lib.config import env, K8sContext
 from lib.operators.spark import SparkOperator
 from lib.operators.arranger import ArrangerOperator
+from test_bash2 import test_bash
 
 with DAG(
         dag_id='etl',
@@ -163,4 +164,4 @@ with DAG(
               ],
     )
 
-    fhavro_export >> import_task >> prepare_index >> index >> publish >> arranger_update_project
+    fhavro_export >> import_task >> prepare_index >> test_bash >> index >> publish >> arranger_update_project

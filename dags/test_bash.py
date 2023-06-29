@@ -1,46 +1,41 @@
-from airflow import DAG
 from datetime import datetime
-from lib.operators.run_import_minio import FileImportOperator
-# from lib.operators.fhavro import
+
+from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from lib import config
 from kubernetes.client import models as k8s
+
+from lib import config
+from lib.config import env
 
 with DAG(
         dag_id='test_bash',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
 ) as dag:
-    script = """
+    script = f"""
         #!/bin/bash
         
-        curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-          --create-dirs \
-          -o $HOME/minio-binaries/mc
-        
-        chmod +x $HOME/minio-binaries/mc
-        export PATH=$PATH:$HOME/minio-binaries/
-        
         echo Setting MC alias to this minio: $AWS_ENDPOINT
-        echo Downloading templates ...
+        mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+        
         mkdir templates
+        
+        echo Downloading templates ...
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_file_centric.json --output ./templates/template_file_centric.json
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_participant_centric.json --output ./templates/template_participant_centric.json
         curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
-        mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
         
         echo Copy templates ...
-        mc cp ./templates/template_study_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_study_centric.json
-        mc cp ./templates/template_file_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_file_centric.json
-        mc cp ./templates/template_participant_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_participant_centric.json
-        mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-qa-app-clinical-data-service/templates/template_biospecimen_centric.json
-        
+        mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_study_centric.json
+        mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_file_centric.json
+        mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_participant_centric.json
+        mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_biospecimen_centric.json     
     """
 
     test_bash = KubernetesPodOperator(
-        task_id='fhavro_export',
-        name='etl-fhavro_export',
+        task_id='es-templates-update',
+        name='es-templates-update',
         image="minio/mc",
         is_delete_operator_pod=False,
         cmds=["bash", "-cx"],
