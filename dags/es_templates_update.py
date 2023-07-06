@@ -19,10 +19,10 @@ script = f"""
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
     
     echo Copy templates ...
-    mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_study_centric.json
-    mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_file_centric.json
-    mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_participant_centric.json
-    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-clinical-data-service/templates/template_biospecimen_centric.json     
+    mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
+    mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
+    mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
+    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json     
 """
 
 es_templates_update = KubernetesPodOperator(
