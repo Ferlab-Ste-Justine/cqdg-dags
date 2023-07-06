@@ -1,6 +1,7 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 from lib import config
+from lib.config import env
 
 class FhavroOperator(KubernetesPodOperator):
 
@@ -72,7 +73,10 @@ class FhavroOperator(KubernetesPodOperator):
                 name='AWS_PATH_ACCESS_STYLE',
                 value='true'
             ),
-
+            k8s.V1EnvVar(
+                name='BUCKET_NAME',
+                value=f'cqdg-{env}-app-datalake',
+            ),
         ]
 
         super().execute(**kwargs)
