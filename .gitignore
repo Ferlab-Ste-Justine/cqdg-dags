@@ -2,6 +2,7 @@
 .idea
 dags/__pycache*
 dags/lib/__pycache__*
+dags/lib/operators/__pycache__*
 logs/*
 __pycache__
 
