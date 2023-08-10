@@ -27,7 +27,7 @@ with DAG(
         name='etl-variant-task_snv',
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
-        spark_class='bio.ferlab.etl.normalize.Normalize',
+        spark_class='bio.ferlab.etl.normalized.Normalized',
         spark_config='etl-index-task',
         arguments=[f'config/{env}-{project()}.conf', 'default', 'snv', study_id()],
     )
@@ -37,9 +37,12 @@ with DAG(
         name='etl-variant_task_consequences',
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
-        spark_class='bio.ferlab.etl.normalize.Normalize',
+        spark_class='bio.ferlab.etl.normalized.Consequences',
         spark_config='etl-index-task',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'consequences', study_id()],
+        arguments=['--config', f'config/{env}-{project()}.conf',
+                   '--steps', 'default',
+                   '--app-name', 'variant_task_consequences',
+                   '--study-id', study_id()],
     )
 
 
