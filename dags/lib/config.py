@@ -1,6 +1,6 @@
 import kubernetes
 from airflow.exceptions import AirflowConfigException
-from airflow.models import Variable
+from airflow.models import Variable, Param
 
 
 class Env:
@@ -31,6 +31,13 @@ spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 jar_version = 'v2.0.0'
 
+default_params = {
+    'study_id': Param('ST0000017', type='string'),
+    'project': Param('cqdg', type='string'),
+}
+study_id = '{{ params.study_id }}'
+project = '{{ params.project }}'
+default_config_file = f'config/{env}-{project}.conf'
 
 if env == Env.QA:
     es_url = 'http://elasticsearch-workers'
