@@ -31,6 +31,6 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.spark_prepare_index_jar,
         spark_class='bio.ferlab.fhir.etl.PrepareIndex',
-        spark_config='etl-index-task',
+        spark_config='etl-task-medium',
         arguments=[f'config/{env}-{project()}.conf', 'default', 'all', release_id(), study_ids()],
     )

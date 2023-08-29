@@ -54,7 +54,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.spark_import_jar,
         spark_class='bio.ferlab.fhir.etl.ImportTask',
-        spark_config='etl-index-task',
+        spark_config='etl-task-small',
         arguments=[f'config/{env}-{project()}.conf', 'default', release_id(), study_ids()],
     )
 
@@ -64,7 +64,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.spark_prepare_index_jar,
         spark_class='bio.ferlab.fhir.etl.PrepareIndex',
-        spark_config='etl-index-task',
+        spark_config='etl-task-small',
         arguments=[f'config/{env}-{project()}.conf', 'default', 'all', release_id(), study_ids()],
     )
 
@@ -75,7 +75,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[release_id(), study_ids(), 'study_centric', env, project(), config.es_url, es_port()],
         )
 
@@ -85,7 +85,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[release_id(), study_ids(), 'participant_centric', env, project(), config.es_url, es_port()],
         )
 
@@ -95,7 +95,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[release_id(), study_ids(), 'file_centric', env, project(), config.es_url, es_port()],
         )
 
@@ -105,7 +105,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), config.es_url, es_port()],
         )
         study_centric >> participant_centric >> file_centric >> biospecimen_centric
@@ -117,7 +117,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'study_centric'],
         )
 
@@ -127,7 +127,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'participant_centric'],
         )
 
@@ -137,7 +137,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'file_centric'],
         )
 
@@ -147,7 +147,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_publish_jar,
             spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
         )
 

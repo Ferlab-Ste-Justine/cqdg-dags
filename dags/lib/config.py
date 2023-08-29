@@ -6,7 +6,7 @@ from airflow.models import Variable, Param
 class Env:
     QA = 'qa'
     DEV = 'dev'
-    PROD = 'prd'
+    PROD = 'prod'
 
 
 class K8sContext:
@@ -24,12 +24,12 @@ base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export:e4ad46ec5b8b95cc8bfe805402e6bd52c8c568f3-1697806260'
-spark_image = 'ferlabcrsj/spark:3.3.1'
-arranger_image = 'ferlabcrsj/cqdg-api-arranger:c4df57e71c2a1202364430cdbaa89b2f28efdd48-1697226171'
+fhavro_export_image = 'ferlabcrsj/fhavro-export:7e31aec82a933622c8f4bf478beac10cd042edb4-1698706632'
+spark_image = 'ferlabcrsj/spark:6916df9ea76364939be282f32a5b2ddacdb3526e'
+arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.0'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
-jar_version = 'v2.10.0'
+jar_version = 'v2.10.9'
 
 default_params = {
     'study_id': Param('ST0000017', type='string'),
@@ -40,36 +40,36 @@ project = '{{ params.project }}'
 default_config_file = f'config/{env}-{project}.conf'
 
 if env == Env.QA:
-    es_url = 'http://elasticsearch-workers'
+    es_url = 'https://workers.search.qa.juno.cqdg.ferlab.bio'
     spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
     spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
     spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
     spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
     variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
     fhir_url = 'http://fhir-server:8080/fhir'
-    keycloak_url = 'http://keycloak-http/auth'
+    keycloak_url = 'http://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.DEV:
-    es_url = 'http://elasticsearch-workers'
+    es_url = 'https://workers.search.qa.juno.cqdg.ferlab.bio'
     spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
     spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
     spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
     spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
     variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
     fhir_url = 'http://fhir-server:8080/fhir'
-    keycloak_url = 'http://keycloak-http/auth'
+    keycloak_url = 'http://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 elif env == Env.PROD:
-    es_url = 'https://elasticsearch-workers'
+    es_url = 'https://workers.search.prod.juno.cqdg.ferlab.bio'
     spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
     spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
     spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
     spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
     variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
-    fhir_url = 'https://fhir.qa.cqdg.ferlab.bio/fhir'
-    keycloak_url = 'http://keycloak-http/auth'
+    fhir_url = 'http://fhir-server:8080/fhir'
+    keycloak_url = 'http://keycloak-http'
     ca_certificates = 'ingress-ca-certificate'
     minio_certificate = 'minio-ca-certificate'
 else:

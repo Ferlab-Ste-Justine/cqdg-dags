@@ -2,6 +2,7 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 from kubernetes.client import models as k8s
 from lib import config
 from lib.config import env
+import time
 
 from dags.lib.config import Env
 
@@ -35,7 +36,25 @@ class ArrangerOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='NODE_EXTRA_CA_CERTS',
-                value='/opt/es-ca/ca.pem',
+                value='/opt/opensearch-ca/ca.crt',
+            ),
+            k8s.V1EnvVar(
+                name='ES_USER',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='opensearch-dags-credentials',
+                        key='username',
+                    ),
+                ),
+            ),
+            k8s.V1EnvVar(
+                name='ES_PASS',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='opensearch-dags-credentials',
+                        key='password',
+                    ),
+                ),
             ),
         ]
 
@@ -54,25 +73,25 @@ class ArrangerOperator(KubernetesPodOperator):
                     name='KEYCLOAK_CLIENT_SECRET',
                     value_from=k8s.V1EnvVarSource(
                         secret_key_ref=k8s.V1SecretKeySelector(
-                            name='arranger-keycloak-credentials',
-                            key='SERVICE_ACCOUNT_CLIENT_SECRET',
+                            name='keycloak-client-system-credentials',
+                            key='client-secret',
                         ),
                     ),
                 )
             )
             self.volumes.append(
                 k8s.V1Volume(
-                    name='es-ca-certificate',
+                    name='opensearch-ca-certificate',
                     secret=k8s.V1SecretVolumeSource(
-                        secret_name='es-ca-certificate',
+                        secret_name='opensearch-ca-certificate',
                         default_mode=0o555
                     ),
                 ),
             )
             self.volume_mounts.append(
                 k8s.V1VolumeMount(
-                    name='es-ca-certificate',
-                    mount_path='/opt/es-ca',
+                    name='opensearch-ca-certificate',
+                    mount_path='/opt/opensearch-ca',
                     read_only=True,
                 ),
             )
@@ -93,6 +112,22 @@ class ArrangerOperator(KubernetesPodOperator):
                         ),
                     ),
                 )
+            )
+            self.volumes.append(
+                k8s.V1Volume(
+                    name='opensearch-ca-certificate',
+                    secret=k8s.V1SecretVolumeSource(
+                        secret_name='opensearch-ca-certificate',
+                        default_mode=0o555
+                    ),
+                ),
+            )
+            self.volume_mounts.append(
+                k8s.V1VolumeMount(
+                    name='opensearch-ca-certificate',
+                    mount_path='/opt/opensearch-ca',
+                    read_only=True,
+                ),
             )
 
         super().execute(**kwargs)
