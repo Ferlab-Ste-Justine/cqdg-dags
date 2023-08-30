@@ -11,6 +11,7 @@ with DAG(
         schedule_interval=None,
         params={
             'study_id': Param('ST0000017', type='string'),
+            'release_id': Param('1', type='string'),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
@@ -20,6 +21,9 @@ with DAG(
 
     def project() -> str:
         return '{{ params.project }}'
+
+    def release_id() -> str:
+        return '{{ params.release_id }}'
 
 
     variant_task_snv = SparkOperator(
@@ -33,7 +37,9 @@ with DAG(
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default',
                    '--app-name', 'variant_task_consequences',
-                   '--study-id', study_id()],
+                   '--release-id', release_id(),
+                   '--study-id', study_id(),
+                   '--vcf-pattern', ''],
     )
 
     variant_task_consequences = SparkOperator(
@@ -47,7 +53,8 @@ with DAG(
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default',
                    '--app-name', 'variant_task_consequences',
-                   '--study-id', study_id()],
+                   '--study-id', study_id(),
+                   '--vcf-pattern', ''],
     )
 
 
