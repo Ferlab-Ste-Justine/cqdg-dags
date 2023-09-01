@@ -29,7 +29,7 @@ spark_image = 'ferlabcrsj/spark:3.3.1'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.2.0'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
-jar_version = 'v2.2.2'
+jar_version = 'v2.2.4'
 
 default_params = {
     'study_id': Param('ST0000017', type='string'),
