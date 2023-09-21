@@ -16,6 +16,7 @@ with DAG(
         'version': Param('7', type='string'),
         'release': Param('13', type='string'),
         'study': Param('cag', type='string'),
+        'project': Param('jmichaud', type='string'),
         'is_restricted': Param('', enum=['', 'true', 'false']),
     },
 ) as dag:
@@ -35,6 +36,9 @@ with DAG(
     def study() -> str:
         return '{{ params.study }}'
 
+    def project() -> str:
+        return '{{ params.project }}'
+
     def is_restricted() -> str:
         return '{{ params.is_restricted }}'
 
@@ -43,5 +47,5 @@ with DAG(
         name='etl-fhir_import',
         k8s_context=K8sContext.DEFAULT,
         arguments=["-cp", "cqdg-fhir-import.jar", "bio/ferlab/cqdg/etl/FhirImport",
-                   prefix(), bucket(), version(), release(), study(), "true", is_restricted()],
+                   prefix(), bucket(), version(), release(), study(), project(), "true", is_restricted()],
     )
