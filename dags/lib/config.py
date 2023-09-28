@@ -26,7 +26,7 @@ show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
 fhavro_export_image = 'ferlabcrsj/fhavro-export:54379845b2f452f558c4d06358fe072a86b596b9-1692277181'
 spark_image = 'ferlabcrsj/spark:3.3.1'
-arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.2.0'
+arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.2.2'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 jar_version = 'v2.5.60'
