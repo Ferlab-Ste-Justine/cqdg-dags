@@ -1,8 +1,5 @@
 from airflow import DAG
-from airflow.models.param import Param
-from airflow.utils.task_group import TaskGroup
 from datetime import datetime
-from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.arranger import ArrangerOperator
 
@@ -10,13 +7,8 @@ with DAG(
         dag_id='update_arranger_project',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
-        params={
-            'project_version': Param('v1', type='string'),
-        },
+        params={},
 ) as dag:
-    def project_version() -> str:
-        return '{{ params.project_version }}'
-
 
 
     arranger_update_project = ArrangerOperator(
@@ -27,6 +19,5 @@ with DAG(
               '--experimental-modules=node',
               '--es-module-specifier-resolution=node',
               'admin/run.mjs',
-              project_version(),
               ],
     )
