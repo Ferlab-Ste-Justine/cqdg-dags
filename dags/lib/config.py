@@ -28,7 +28,7 @@ fhavro_export_image = 'ferlabcrsj/fhavro-export:7e31aec82a933622c8f4bf478beac10c
 spark_image = 'ferlabcrsj/spark:6916df9ea76364939be282f32a5b2ddacdb3526e'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.0'
 spark_service_account = 'spark'
-cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import:bf3e87c'
+cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 jar_version = 'v2.10.9'
 
 default_params = {
