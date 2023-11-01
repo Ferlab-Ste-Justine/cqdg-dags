@@ -39,6 +39,7 @@ with DAG(
     def project() -> str:
         return '{{ params.project }}'
 
+
     def is_restricted() -> str:
         return '{{ params.is_restricted }}'
 

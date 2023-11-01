@@ -18,11 +18,21 @@ script = f"""
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_participant_centric.json --output ./templates/template_participant_centric.json
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
     
+    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_variant_centric.json --output ./templates/template_variant_centric.json
+    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_centric.json --output ./templates/template_gene_centric.json
+    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_variant_suggestions.json --output ./templates/template_variant_suggestions.json
+    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_suggestions.json --output ./templates/template_gene_suggestions.json
+    
     echo Copy templates ...
     mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
     mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
     mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
-    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json     
+    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json 
+        
+    mc cp ./templates/template_variant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_variant_centric.json     
+    mc cp ./templates/template_gene_centric.json myminio/cqdg-{env}-app-datalake/templates/template_gene_centric.json     
+    mc cp ./templates/template_variant_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_variant_suggestions.json     
+    mc cp ./templates/template_gene_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_gene_suggestions.json     
 """
 
 es_templates_update = KubernetesPodOperator(
@@ -36,14 +46,14 @@ es_templates_update = KubernetesPodOperator(
     env_vars=[
         k8s.V1EnvVar(
             name='AWS_ENDPOINT',
-            value='https://s3.ops.cqdg.ferlab.bio',
+            value='https://objets.juno.calculquebec.ca',
         ),
         k8s.V1EnvVar(
             name='AWS_ACCESS_KEY_ID',
             value_from=k8s.V1EnvVarSource(
                 secret_key_ref=k8s.V1SecretKeySelector(
-                    name='s3-fhir-import-credentials',
-                    key='S3_ACCESS_KEY',
+                    name='ceph-s3-credentials',
+                    key='access',
                 ),
             ),
         ),
@@ -51,8 +61,8 @@ es_templates_update = KubernetesPodOperator(
             name='AWS_SECRET_ACCESS_KEY',
             value_from=k8s.V1EnvVarSource(
                 secret_key_ref=k8s.V1SecretKeySelector(
-                    name='s3-fhir-import-credentials',
-                    key='S3_SECRET_KEY',
+                    name='ceph-s3-credentials',
+                    key='secret',
                 ),
             ),
         ), ]

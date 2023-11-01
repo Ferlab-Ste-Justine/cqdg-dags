@@ -65,7 +65,7 @@ class SparkOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='AWS_ENDPOINT',
-                value='https://s3.ops.cqdg.ferlab.bio',
+                value='https://objets.juno.calculquebec.ca',
             ),
             k8s.V1EnvVar(
                 name='SPARK_JAR',
@@ -74,7 +74,25 @@ class SparkOperator(KubernetesPodOperator):
             k8s.V1EnvVar(
                 name='SPARK_CLASS',
                 value=self.spark_class,
-            )
+            ),
+            k8s.V1EnvVar(
+                name='ES_USERNAME',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='opensearch-dags-credentials',
+                        key='username',
+                    ),
+                ),
+            ),
+            k8s.V1EnvVar(
+                name='ES_PASSWORD',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name='opensearch-dags-credentials',
+                        key='password',
+                    ),
+                ),
+            ),
         ]
         self.volumes = [
             k8s.V1Volume(
@@ -91,15 +109,14 @@ class SparkOperator(KubernetesPodOperator):
             ),
         ]
 
-        if env in [Env.PROD]:
-            self.volumes.append(
-                k8s.V1Volume(
-                    name='es-ca-certificate',
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name='es-ca-certificate',
-                    ),
+        self.volumes.append(
+            k8s.V1Volume(
+                name='opensearch-ca-certificate',
+                secret=k8s.V1SecretVolumeSource(
+                    secret_name='opensearch-ca-certificate',
                 ),
-            )
+            ),
+        )
 
         self.volume_mounts = [
             k8s.V1VolumeMount(
@@ -114,14 +131,13 @@ class SparkOperator(KubernetesPodOperator):
             ),
         ]
 
-        if env in [Env.PROD]:
-            self.volume_mounts.append(
-                k8s.V1VolumeMount(
-                    name='es-ca-certificate',
-                    mount_path='/opt/es-ca',
-                    read_only=True,
-                ),
-            )
+        self.volume_mounts.append(
+            k8s.V1VolumeMount(
+                name='opensearch-ca-certificate',
+                mount_path='/opt/es-ca',
+                read_only=True,
+            ),
+        )
 
         if self.spark_config:
             self.volumes.append(

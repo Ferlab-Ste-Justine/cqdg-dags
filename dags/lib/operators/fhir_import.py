@@ -1,6 +1,7 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 from lib import config
+from lib.config import env
 
 
 class FhirCsvOperator(KubernetesPodOperator):
@@ -32,8 +33,8 @@ class FhirCsvOperator(KubernetesPodOperator):
                 name='AWS_ACCESS_KEY',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
-                        name='s3-fhir-import-credentials',
-                        key='S3_ACCESS_KEY',
+                        name='ceph-s3-credentials',
+                        key='access',
                     ),
                 ),
             ),
@@ -41,18 +42,18 @@ class FhirCsvOperator(KubernetesPodOperator):
                 name='AWS_SECRET_KEY',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
-                        name='s3-fhir-import-credentials',
-                        key='S3_SECRET_KEY',
+                        name='ceph-s3-credentials',
+                        key='secret',
                     ),
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_BUCKET_NAME',
-                value='cqdg-prod-user-thibault-demalliard01',
+                name='AWS_OUTPUT_BUCKET_NAME',
+                value=f'cqdg-{env}-app-clinical-data-service',
             ),
             k8s.V1EnvVar(
                 name='AWS_ENDPOINT',
-                value='https://s3.ops.cqdg.ferlab.bio',
+                value='https://objets.juno.calculquebec.ca',
             ),
             k8s.V1EnvVar(
                 name='FHIR_URL',
@@ -61,6 +62,10 @@ class FhirCsvOperator(KubernetesPodOperator):
             k8s.V1EnvVar(
                 name='ID_SERVICE_HOST',
                 value='http://id-service:5000',
+            ),
+            k8s.V1EnvVar(
+                name='AWS_NARVAL_BUCKET',
+                value=f'cqdg-{env}-file-import',
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_CLIENT_SECRET',
@@ -73,29 +78,7 @@ class FhirCsvOperator(KubernetesPodOperator):
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_URL',
-                value='http://keycloak-http/auth/',
-            ),
-            k8s.V1EnvVar(
-                name='NANUQ_ENDPOINT',
-                value='https://ces.genomequebec.com/nanuqMPS/ws/getRunInfo',
-            ),
-            k8s.V1EnvVar(
-                name='NANUQ_PASSWORD',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='nanuq-credentials',
-                        key='nanuq-password',
-                    ),
-                ),
-            ),
-            k8s.V1EnvVar(
-                name='NANUQ_USERNAME',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='nanuq-credentials',
-                        key='nanuq-username',
-                    ),
-                ),
+                value='http://keycloak-http',
             ),
         ]
         self.cmds = ['java']

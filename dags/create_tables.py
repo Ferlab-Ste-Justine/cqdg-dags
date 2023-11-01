@@ -61,7 +61,7 @@ with DAG(
                        k8s_context=K8sContext.DEFAULT,
                        spark_jar=variant_task_jar,
                        spark_class='bio.ferlab.datalake.spark3.hive.CreateTableAndView',
-                       spark_config='etl-index-task',
+                       spark_config='etl-task-small',
                        arguments=['--config', default_config_file,
                                   '--steps', 'default',
                                   '--app-name', 'create_table_and_view',
