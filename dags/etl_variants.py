@@ -15,6 +15,7 @@ with DAG(
             'owner': Param('jmichaud', type='string'),
             'release_id': Param('1', type='string'),
             'dataset': Param('dataset_default', type='string'),
+            'batch': Param('annotated_vcf', type='string'),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
@@ -33,6 +34,9 @@ with DAG(
 
     def dataset() -> str:
         return '{{ params.dataset }}'
+    
+    def batch() -> str:
+        return '{{ params.batch }}'    
 
     def owner() -> str:
         return '{{ params.owner }}'
@@ -52,6 +56,7 @@ with DAG(
                    '--release-id', release_id(),
                    '--owner', owner(),
                    '--dataset', dataset(),
+                   '--batch', batch(),
                    '--study-id', study_id(),
                    '--study-code', study_code()
                    ],
@@ -71,7 +76,8 @@ with DAG(
                    '--study-id', study_id(),
                    '--study-code', study_code(),
                    '--owner', owner(),
-                   '--dataset', dataset()],
+                   '--dataset', dataset(),
+                   '--batch', batch()],
     )
 
 
