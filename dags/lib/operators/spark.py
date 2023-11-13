@@ -138,6 +138,14 @@ class SparkOperator(KubernetesPodOperator):
                 read_only=True,
             ),
         )
+        # Temp: placer certs dans /opt/.. ou /etc/certs selon besoin de Spark pour cert Opensearch ou autres
+        self.volume_mounts.append(
+            k8s.V1VolumeMount(
+                name='opensearch-ca-certificate',
+                mount_path='/etc/certs',
+                read_only=True,
+            ),
+        )
 
         if self.spark_config:
             self.volumes.append(
