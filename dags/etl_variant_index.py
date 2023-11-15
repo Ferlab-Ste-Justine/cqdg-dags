@@ -42,7 +42,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.VariantIndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[es_port(), release_id(), 'gene_centric', f'config/{env}-{project()}.conf',
                        f's3a://cqdg-{env}-app-datalake/es_index/gene_centric/', "all", config.es_url],
         )
@@ -53,7 +53,7 @@ with DAG(
             k8s_context=K8sContext.DEFAULT,
             spark_jar=config.spark_index_jar,
             spark_class='bio.ferlab.fhir.etl.VariantIndexTask',
-            spark_config='etl-index-task',
+            spark_config='etl-task-small',
             arguments=[es_port(), release_id(), 'gene_suggestions', f'config/{env}-{project()}.conf',
                        f's3a://cqdg-{env}-app-datalake/es_index/gene_suggestions/', "all", config.es_url],
         )
@@ -68,7 +68,7 @@ with DAG(
                 k8s_context=K8sContext.DEFAULT,
                 spark_jar=config.spark_index_jar,
                 spark_class='bio.ferlab.fhir.etl.VariantIndexTask',
-                spark_config='etl-index-task',
+                spark_config='etl-task-small',
                 arguments=[es_port(), release_id(), 'variant_centric', f'config/{env}-{project()}.conf',
                            f's3a://cqdg-{env}-app-datalake/es_index/variant_centric/', c, config.es_url],
             )
@@ -79,7 +79,7 @@ with DAG(
                 k8s_context=K8sContext.DEFAULT,
                 spark_jar=config.spark_index_jar,
                 spark_class='bio.ferlab.fhir.etl.VariantIndexTask',
-                spark_config='etl-index-task',
+                spark_config='etl-task-small',
                 arguments=[es_port(), release_id(), 'variant_suggestions', f'config/{env}-{project()}.conf',
                            f's3a://cqdg-{env}-app-datalake/es_index/variant_suggestions/', c, config.es_url],
             )
