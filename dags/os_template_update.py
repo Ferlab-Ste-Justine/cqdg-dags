@@ -16,8 +16,7 @@ with DAG(
     script = f"""
     #!/bin/bash
     
-    sudo apt update
-    sudo apt install curl
+    apt-get update && apt-get install curl
     
     echo Setting MC alias to this minio: $AWS_ENDPOINT
     mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
