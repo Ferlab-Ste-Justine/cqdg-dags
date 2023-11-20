@@ -6,7 +6,7 @@ from kubernetes.client import models as k8s
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 
 with DAG(
-        dag_id='etl',
+        dag_id='es_templates_update',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
