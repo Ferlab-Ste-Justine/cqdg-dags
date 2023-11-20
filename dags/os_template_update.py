@@ -16,7 +16,8 @@ with DAG(
     script = f"""
     #!/bin/bash
     
-    apk add -U curl
+    apk update
+    apk add curl
     
     echo Setting MC alias to this minio: $AWS_ENDPOINT
     mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
