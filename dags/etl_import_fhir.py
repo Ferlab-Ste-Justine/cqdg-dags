@@ -13,8 +13,8 @@ with DAG(
     params={
         'prefix': Param('prefix', type='string'),
         'bucket': Param('cqdg-qa-app-clinical-data-service', type='string'),
-        'version': Param('7', type='string'),
-        'release': Param('13', type='string'),
+        'studyId': Param('7', type='string'),
+        'studyVersion': Param('13', type='string'),
         'study': Param('cag', type='string'),
         'project': Param('jmichaud', type='string'),
         'is_restricted': Param('', enum=['', 'true', 'false']),
@@ -27,11 +27,11 @@ with DAG(
     def bucket() -> str:
         return '{{ params.bucket }}'
 
-    def version() -> str:
-        return '{{ params.version }}'
+    def study_clin_data_id() -> str:
+        return '{{ params.studyId }}'
 
-    def release() -> str:
-        return '{{ params.release }}'
+    def study_clin_data_version() -> str:
+        return '{{ params.studyVersion }}'
 
     def study() -> str:
         return '{{ params.study }}'
@@ -48,5 +48,5 @@ with DAG(
         name='etl-fhir_import',
         k8s_context=K8sContext.DEFAULT,
         arguments=["-cp", "cqdg-fhir-import.jar", "bio/ferlab/cqdg/etl/FhirImport",
-                   prefix(), bucket(), version(), release(), study(), project(), "true", is_restricted()],
+                   prefix(), bucket(), study_clin_data_id(), study_clin_data_version(), study(), project(), "true", is_restricted()],
     )
