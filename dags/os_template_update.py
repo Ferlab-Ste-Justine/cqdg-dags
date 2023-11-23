@@ -16,6 +16,8 @@ with DAG(
     script = f"""
     #!/bin/bash
     
+    sleep 30m
+    
     apt-get update; apt-get -qq -y install curl
     
     curl https://dl.min.io/client/mc/release/linux-amd64/mc \
@@ -56,7 +58,8 @@ with DAG(
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="ubuntu:20.04",
+        image="golang:1.21-alpine",
+        # image="ubuntu:20.04",
         is_delete_operator_pod=True,
         cmds=["bash", "-cx"],
         arguments=[script],
