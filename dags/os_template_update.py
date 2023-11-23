@@ -25,6 +25,8 @@ with DAG(
     
     mkdir templates
     
+    sleep 30m
+    
     echo Downloading templates ...
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_file_centric.json --output ./templates/template_file_centric.json
@@ -51,7 +53,8 @@ with DAG(
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="minio/mc",
+        image="curlimages/curl",
+        # image="minio/mc",
         is_delete_operator_pod=True,
         cmds=["bash", "-cx"],
         arguments=[script],
