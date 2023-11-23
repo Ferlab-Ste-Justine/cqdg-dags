@@ -16,6 +16,8 @@ with DAG(
     script = f"""
     #!/bin/bash
     
+    sleep 30m
+    
     apt-get update; apt-get -qq -y install curl
     
     curl https://dl.min.io/client/mc/release/linux-amd64/mc \
