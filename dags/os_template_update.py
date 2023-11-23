@@ -56,7 +56,7 @@ with DAG(
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="alpine:latest",
+        image="alpine:3.14",
         # image="ubuntu:20.04",
         # image="minio/mc",
         is_delete_operator_pod=True,
