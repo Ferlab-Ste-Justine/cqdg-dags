@@ -18,8 +18,7 @@ with DAG(
     
     apk update
     apk add curl
-    
-    sleep 30m
+
     
     echo Setting MC alias to this minio: $AWS_ENDPOINT
     mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
