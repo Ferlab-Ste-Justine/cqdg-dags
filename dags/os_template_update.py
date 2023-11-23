@@ -16,12 +16,12 @@ with DAG(
     script = f"""
     #!/bin/bash
     
-    apk update
-    apk add curl
-
-    
-    echo Setting MC alias to this minio: $AWS_ENDPOINT
-    mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+    # apk update
+    # apk add curl
+    # 
+    # 
+    # echo Setting MC alias to this minio: $AWS_ENDPOINT
+    # mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
     
     mkdir templates
     
@@ -39,21 +39,21 @@ with DAG(
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_suggestions.json --output ./templates/template_gene_suggestions.json
     
     echo Copy templates ...
-    mc cp https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
-    mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
-    mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
-    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json 
-        
-    mc cp ./templates/template_variant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_variant_centric.json     
-    mc cp ./templates/template_gene_centric.json myminio/cqdg-{env}-app-datalake/templates/template_gene_centric.json     
-    mc cp ./templates/template_variant_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_variant_suggestions.json     
-    mc cp ./templates/template_gene_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_gene_suggestions.json     
+    # mc cp https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
+    # mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
+    # mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
+    # mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json 
+    #     
+    # mc cp ./templates/template_variant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_variant_centric.json     
+    # mc cp ./templates/template_gene_centric.json myminio/cqdg-{env}-app-datalake/templates/template_gene_centric.json     
+    # mc cp ./templates/template_variant_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_variant_suggestions.json     
+    # mc cp ./templates/template_gene_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_gene_suggestions.json     
 """
 
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="bitnami/minio-client",
+        image="alpine",
         # image="minio/mc",
         is_delete_operator_pod=True,
         cmds=["bash", "-cx"],
