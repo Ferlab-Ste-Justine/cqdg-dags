@@ -16,16 +16,19 @@ with DAG(
     script = f"""
     #!/bin/bash
     
-    # apk update
-    # apk add curl
-    # 
-    # 
-    # echo Setting MC alias to this minio: $AWS_ENDPOINT
-    # mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+    apt-get update; apt-get -qq -y install curl
+    
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+    --create-dirs \
+    -o $HOME/minio-binaries/mc
+
+    chmod +x $HOME/minio-binaries/mc
+    export PATH=$PATH:$HOME/minio-binaries/
+    
+    echo Setting MC alias to this minio: $AWS_ENDPOINT
+    mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
     
     mkdir templates
-    
-    sleep 30m
     
     echo Downloading templates ...
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
@@ -39,7 +42,7 @@ with DAG(
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_suggestions.json --output ./templates/template_gene_suggestions.json
     
     echo Copy templates ...
-    # mc cp https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
+    # mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
     # mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
     # mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
     # mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json 
