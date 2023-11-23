@@ -53,7 +53,7 @@ with DAG(
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="alpine:3.18.4",
+        image="bitnami/minio-client",
         # image="minio/mc",
         is_delete_operator_pod=True,
         cmds=["bash", "-cx"],
