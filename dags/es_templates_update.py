@@ -7,6 +7,15 @@ from lib.config import env
 script = f"""
     #!/bin/bash
     
+    apk update; apk add -U curl
+    
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+    --create-dirs \
+    -o $HOME/minio-binaries/mc
+
+    chmod +x $HOME/minio-binaries/mc
+    export PATH=$PATH:$HOME/minio-binaries/
+    
     echo Setting MC alias to this minio: $AWS_ENDPOINT
     mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
     
@@ -38,9 +47,9 @@ script = f"""
 es_templates_update = KubernetesPodOperator(
     task_id='es_templates_update',
     name='es-templates-update',
-    image="minio/mc",
+    image="alpine:3.14",
     is_delete_operator_pod=True,
-    cmds=["bash", "-cx"],
+    cmds=["sh", "-cx"],
     arguments=[script],
     namespace=config.k8s_namespace,
     env_vars=[
