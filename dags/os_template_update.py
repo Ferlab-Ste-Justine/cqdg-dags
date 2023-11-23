@@ -56,9 +56,10 @@ with DAG(
     es_templates_update = KubernetesPodOperator(
         task_id='es_templates_update',
         name='es-templates-update',
-        image="ubuntu:20.04",
+        image="alpine:3.14",
+        # image="ubuntu:20.04",
         is_delete_operator_pod=True,
-        cmds=["bash", "-cx"],
+        cmds=["sh", "-cx"],
         arguments=[script],
         namespace=config.k8s_namespace,
         env_vars=[
