@@ -16,9 +16,7 @@ with DAG(
     script = f"""
     #!/bin/bash
     
-    sleep 30m
-    
-    apt-get update; apt-get -qq -y install curl
+    apk update; apk add -U curl
     
     curl https://dl.min.io/client/mc/release/linux-amd64/mc \
     --create-dirs \
@@ -59,7 +57,6 @@ with DAG(
         task_id='es_templates_update',
         name='es-templates-update',
         image="alpine:3.14",
-        # image="ubuntu:20.04",
         is_delete_operator_pod=True,
         cmds=["sh", "-cx"],
         arguments=[script],
