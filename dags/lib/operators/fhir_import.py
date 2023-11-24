@@ -48,7 +48,7 @@ class FhirCsvOperator(KubernetesPodOperator):
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_OUTPUT_BUCKET_NAME',
+                name='S3_CLINICAL_DATA_BUCKET_NAME',
                 value=f'cqdg-{env}-app-clinical-data-service',
             ),
             k8s.V1EnvVar(
@@ -64,7 +64,7 @@ class FhirCsvOperator(KubernetesPodOperator):
                 value='http://id-service:5000',
             ),
             k8s.V1EnvVar(
-                name='AWS_NARVAL_BUCKET',
+                name='S3_FILE_IMPORT_BUCKET',
                 value=f'cqdg-{env}-file-import',
             ),
             k8s.V1EnvVar(
