@@ -11,7 +11,7 @@ with DAG(
         schedule_interval=None,
         params={
             'obo_url': Param('https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo', type='string'),
-            'ontology ': Param('hpo_terms', type='string'),
+            'ontology ': Param("hpo_terms", type='string'),
             'is_icd': Param(False, type='boolean'),
             'required_top_node': Param("", type='string'),
         },
