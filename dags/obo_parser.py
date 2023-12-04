@@ -27,10 +27,6 @@ with DAG(
     def required_top_node() -> str:
         return '{{ params.required_top_node }}'
 
-    def path() -> str:
-        return f's3a://cqdg-{env}-app-datalake/' + ontology() + '/'
-
-
     import_task = SparkOperator(
         task_id='obo_parser_task',
         name='obo_parser-task',
@@ -38,5 +34,5 @@ with DAG(
         spark_jar=config.obo_parser_jar,
         spark_class='bio.ferlab.HPOMain',
         spark_config='etl-task-small',
-        arguments=[obo_url(), path(), is_icd(), required_top_node()],
+        arguments=[obo_url(), f'cqdg-{env}-app-datalake', ontology(), is_icd(), required_top_node()],
     )
