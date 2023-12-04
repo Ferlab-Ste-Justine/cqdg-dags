@@ -29,6 +29,7 @@ spark_image = 'ferlabcrsj/spark:6916df9ea76364939be282f32a5b2ddacdb3526e'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.2'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
+obo_parser_jar_version = 'v1.0.0'
 jar_version = 'v2.13.5'
 
 default_params = {
@@ -75,6 +76,7 @@ elif env == Env.PROD:
 else:
     raise AirflowConfigException(f'Unexpected environment "{env}"')
 
+obo_parser_jar = f'https://github.com/Ferlab-Ste-Justine/obo-parser/releases/download/{obo_parser_jar_version}/obo-parser.jar'
 
 def env_url(prefix: str = '') -> str:
     return f'{prefix}{env}' if env in [Env.QA, Env.DEV] else ''
