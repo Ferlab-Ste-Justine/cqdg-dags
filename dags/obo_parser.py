@@ -11,6 +11,7 @@ with DAG(
         schedule_interval=None,
         params={
             'obo_url': Param('https://raw.githubusercontent.com/obophenotype/human-phenotype-ontology/master/hp.obo', type='string'),
+            'ontology ': Param('hpo_terms', enum=['', 'hpo_terms', 'mondo_terms']),
             'is_icd': Param(False, type='boolean'),
             'required_top_node': Param("", type='string'),
         },
@@ -18,6 +19,8 @@ with DAG(
     def obo_url() -> str:
         return '{{ params.obo_url }}'
 
+    def ontology() -> str:
+        return '{{ params.ontology }}'
     def is_icd() -> str:
         return '{{ params.is_icd }}'
 
@@ -31,5 +34,5 @@ with DAG(
         spark_jar=config.obo_parser_jar,
         spark_class='bio.ferlab.HPOMain',
         spark_config='etl-task-small',
-        arguments=[obo_url(), f's3a://cqdg-{env}-app-datalake/hpo_terms/', is_icd(), required_top_node()],
+        arguments=[obo_url(), f's3a://cqdg-{env}-app-datalake/{ontology}/', is_icd(), required_top_node()],
     )
