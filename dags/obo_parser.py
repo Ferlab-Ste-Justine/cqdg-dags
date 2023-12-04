@@ -5,7 +5,7 @@ from lib import config
 from lib.config import env, Env, K8sContext
 from lib.operators.spark import SparkOperator
 
-with (DAG(
+with DAG(
         dag_id='obo_parser',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
@@ -14,7 +14,7 @@ with (DAG(
             'is_icd': Param(False, type='boolean'),
             'required_top_node': Param("", type='string'),
         },
-) as dag):
+) as dag:
     def obo_url() -> str:
         return '{{ params.obo_url }}'
 
