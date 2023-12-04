@@ -34,5 +34,5 @@ with DAG(
         spark_jar=config.obo_parser_jar,
         spark_class='bio.ferlab.HPOMain',
         spark_config='etl-task-small',
-        arguments=[obo_url(), f's3a://cqdg-{env}-app-datalake/{ontology}/', is_icd(), required_top_node()],
+        arguments=[obo_url(), f's3a://cqdg-{env}-app-datalake/{ontology()}/', is_icd(), required_top_node()],
     )
