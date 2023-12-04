@@ -24,13 +24,6 @@ with DAG(
     def required_top_node() -> str:
         return '{{ params.required_top_node }}'
 
-    args = [obo_url(), f's3a://cqdg-{env}-app-datalake/hpo_terms/', is_icd()]
-
-    check = required_top_node()
-
-    if required_top_node() and required_top_node() != "":
-        args.append(required_top_node())
-
     import_task = SparkOperator(
         task_id='obo_parser_task',
         name='obo_parser-task',
@@ -38,5 +31,5 @@ with DAG(
         spark_jar=config.obo_parser_jar,
         spark_class='bio.ferlab.HPOMain',
         spark_config='etl-task-small',
-        arguments=args,
+        arguments=[obo_url(), f's3a://cqdg-{env}-app-datalake/hpo_terms/', is_icd(), required_top_node()],
     )
