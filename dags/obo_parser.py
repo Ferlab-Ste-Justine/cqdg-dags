@@ -30,7 +30,7 @@ with (DAG(
         args.append(required_top_node())
 
     import_task = SparkOperator(
-        task_id='obo+parser_task',
+        task_id='obo_parser_task',
         name='obo_parser-task',
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.obo_parser_jar,
