@@ -28,9 +28,8 @@ with DAG(
 
     check = required_top_node()
 
-    # if check:
-    #     print("CHECK")
-    #     args.append(required_top_node())
+    if required_top_node() and required_top_node() != "":
+        args.append(required_top_node())
 
     import_task = SparkOperator(
         task_id='obo_parser_task',
