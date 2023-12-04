@@ -26,7 +26,10 @@ with DAG(
 
     args = [obo_url(), f's3a://cqdg-{env}-app-datalake/hpo_terms/', is_icd()]
 
-    if required_top_node():
+    check = required_top_node()
+
+    if check:
+        print("CHECK")
         args.append(required_top_node())
 
     import_task = SparkOperator(
