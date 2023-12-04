@@ -18,8 +18,8 @@ with DAG(
     def obo_url() -> str:
         return '{{ params.obo_url }}'
 
-    def is_icd() -> bool:
-        return bool('{{ params.is_icd }}')
+    def is_icd() -> str:
+        return '{{ params.is_icd }}'
 
     def required_top_node() -> str:
         return '{{ params.required_top_node }}'
