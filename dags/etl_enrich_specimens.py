@@ -29,6 +29,10 @@ with DAG(
         spark_jar=config.spark_prepare_index_jar,
         spark_class='bio.ferlab.fhir.etl.Enrich',
         spark_config='etl-task-small',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', study_ids()],
+        arguments=['specimen',
+                   '--config', f'config/{env}-{project()}.conf',
+                   '--steps', 'default',
+                   '--app-name', 'enrich_specimen',
+                   '--study-id', study_ids()],
     )
 
