@@ -42,7 +42,7 @@ with DAG(
         return '{{ params.owner }}'
 
 
-    variant_task_snv = SparkOperator(
+    variant_task_variants = SparkOperator(
         task_id='variant-task_snv',
         name='etl-variant-task_snv',
         k8s_context=K8sContext.DEFAULT,
@@ -81,4 +81,4 @@ with DAG(
     )
 
 
-variant_task_snv >> variant_task_consequences
+variant_task_variants >> variant_task_consequences
