@@ -30,7 +30,7 @@ arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.2'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 obo_parser_jar_version = 'v1.0.9'
-jar_version = 'v2.21.0'
+jar_version = 'v2.21.1'
 
 default_params = {
     'study_id': Param('ST0000017', type='string'),
