@@ -65,7 +65,7 @@ with DAG(
         spark_jar=config.spark_prepare_index_jar,
         spark_class='bio.ferlab.fhir.etl.PrepareIndex',
         spark_config='etl-task-small',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', release_id(), study_ids()],
+        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', study_ids()],
     )
 
     with TaskGroup(group_id='index') as index:
