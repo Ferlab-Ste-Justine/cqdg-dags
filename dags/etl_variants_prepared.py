@@ -17,13 +17,16 @@ with DAG(
     def project() -> str:
         return '{{ params.project }}'
 
+    def spark_config():
+        return 'etl-task-xlarge' if env == Env.PROD else 'etl-task-large'
+
     variant_task_variant_centric = SparkOperator(
         task_id='variant_task_variant_centric',
         name='etl-variant_task_variant_centric',
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.prepared.RunPrepared',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['variant_centric',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
@@ -35,7 +38,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.prepared.RunPrepared',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['gene_centric',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
@@ -47,7 +50,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.prepared.RunPrepared',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['variant_suggestions',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
@@ -59,7 +62,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.prepared.RunPrepared',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['gene_suggestions',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
