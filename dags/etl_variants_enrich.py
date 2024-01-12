@@ -16,6 +16,9 @@ with DAG(
     def project() -> str:
         return '{{ params.project }}'
 
+    def spark_config():
+        return 'etl-task-xlarge' if env == Env.PROD else 'etl-task-large'
+
 
     variant_task_enrich_variants = SparkOperator(
         task_id='variant_task_variant_enrich_snv',
@@ -23,7 +26,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.enriched.RunEnrichGenomic',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['variants',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
@@ -35,7 +38,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.enriched.RunEnrichGenomic',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['consequences',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default'],
