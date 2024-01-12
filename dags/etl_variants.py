@@ -70,7 +70,7 @@ with DAG(
         k8s_context=K8sContext.DEFAULT,
         spark_jar=config.variant_task_jar,
         spark_class='bio.ferlab.etl.normalized.RunNormalizedGenomic',
-        spark_config='etl-task-xlarge',
+        spark_config=spark_config(),
         arguments=['consequences',
                    '--config', f'config/{env}-{project()}.conf',
                    '--steps', 'default',
