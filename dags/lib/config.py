@@ -24,13 +24,13 @@ base_url = Variable.get('base_url', None)
 s3_conn_id = Variable.get('s3_conn_id', None)
 show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export:f7bf55fdd5bc1cd66d6b111f75e5f85c3e1a0c03-1700755841'
+fhavro_export_image = 'ferlabcrsj/fhavro-export:86852f678cf568d453d6600ce56735c76ef946d2-1708714675'
 spark_image = 'ferlabcrsj/spark:6916df9ea76364939be282f32a5b2ddacdb3526e'
 arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.2'
 spark_service_account = 'spark'
 cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
 obo_parser_jar_version = 'v1.0.9'
-jar_version = 'v2.21.3'
+jar_version = 'v2.21.5'
 
 default_params = {
     'study_id': Param('ST0000017', type='string'),
