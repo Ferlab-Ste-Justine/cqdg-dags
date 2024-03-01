@@ -15,7 +15,7 @@ with DAG(
     task_id="test_error_message",
     image=Variable.get("hello"),
     cmds=["/bin/sh"],
-    arguments=["-c", "echo {{ var.value.hello}}"],
+    arguments=["-c", "echo  {{ var.value.hello}}"],
     name="test-config-map"
 )
 
