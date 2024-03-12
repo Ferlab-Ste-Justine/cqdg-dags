@@ -1,104 +1,159 @@
 import kubernetes
 from airflow.exceptions import AirflowConfigException
 from airflow.models import Variable, Param
-
+from lib.operators.spark import SparkOperatorConfig
+from lib.operators.base_kubernetes import KubeConfig
+from lib.operators.fhavro import FhavroConfig
+from lib.operators.fhir_import import FhirCsvConfig
 
 class Env:
     QA = 'qa'
     DEV = 'dev'
     PROD = 'prod'
 
-
-class K8sContext:
-    DEFAULT = 'default'
-    ETL = 'etl'
-
-
 env = Variable.get('environment')
-k8s_namespace = Variable.get('kubernetes_namespace')
-k8s_context = {
-    K8sContext.DEFAULT: Variable.get('kubernetes_context_default', None),
-    K8sContext.ETL: Variable.get('kubernetes_context_etl', None),
-}
-base_url = Variable.get('base_url', None)
-s3_conn_id = Variable.get('s3_conn_id', None)
-show_test_dags = Variable.get('show_test_dags', None) == 'yes'
 
-fhavro_export_image = 'ferlabcrsj/fhavro-export:86852f678cf568d453d6600ce56735c76ef946d2-1708714675'
-spark_image = 'ferlabcrsj/spark:6916df9ea76364939be282f32a5b2ddacdb3526e'
-arranger_image = 'ferlabcrsj/cqdg-api-arranger:1.3.2'
-cqdg_fhir_import = 'ferlabcrsj/cqdg-fhir-import'
-obo_parser_jar_version = 'v1.0.9'
-jar_version = 'v2.21.5'
-spark_service_account = 'spark'
+es_url = Variable.get('es_url')
+es_port = Variable.get('es_port', '9200')
+keycloak_url = Variable.get('keycloak_url')
+fhir_url = Variable.get('fhir_url')
+
+aws_secret_name = 'ceph-s3-credentials'
+aws_secret_access_key = 'access'
+aws_secret_secret_key = 'secret'
+
+aws_endpoint = Variable.get('object_store_url')
+hive_metastore_uri=Variable.get('hive_metastore_uri')
+
+datalake_bucket = Variable.get('datalake_bucket')
+clinical_data_bucket = Variable.get('clinical_data_bucket')
+file_import_bucket = Variable.get('file_import_bucket')
+
+keycloak_client_secret_name = 'keycloak-client-system-credentials'
+
+es_credentials_secret_name = 'opensearch-dags-credentials'
+es_credentials_secret_key_username = 'username'
+es_credentials_secret_key_password = 'password'
 
 default_params = {
     'study_id': Param('ST0000017', type='string'),
     'project': Param('cqdg', type='string'),
 }
+
 study_id = '{{ params.study_id }}'
+study_ids = '{{ params.study_ids }}'
 project = '{{ params.project }}'
+project = '{{ params.project }}'
+dataset ='{{ params.dataset }}'
+batch = '{{ params.batch }}'    
+release_id ='{{ params.release_id }}'    
 default_config_file = f'config/{env}-{project}.conf'
 
-if env == Env.QA:
-    es_url = 'https://workers.search.qa.juno.cqdg.ferlab.bio'
-    spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
-    spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
-    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
-    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
-    variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
-    fhir_url = 'http://fhir-server:8080/fhir'
-    keycloak_url = 'http://keycloak-http'
-    ca_certificates = 'ingress-ca-certificate'
-    minio_certificate = 'minio-ca-certificate'
-elif env == Env.DEV:
-    es_url = 'https://workers.search.qa.juno.cqdg.ferlab.bio'
-    spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
-    spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
-    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
-    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
-    variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
-    fhir_url = 'http://fhir-server:8080/fhir'
-    keycloak_url = 'http://keycloak-http'
-    ca_certificates = 'ingress-ca-certificate'
-    minio_certificate = 'minio-ca-certificate'
-elif env == Env.PROD:
-    es_url = 'https://workers.search.prod.juno.cqdg.ferlab.bio'
-    spark_import_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/import-task.jar'
-    spark_prepare_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/prepare-index.jar'
-    spark_index_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/index-task.jar'
-    spark_publish_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/publish-task.jar'
-    variant_task_jar = f'https://github.com/Ferlab-Ste-Justine/etl-cqdg-portal/releases/download/{jar_version}/variant-task.jar'
-    fhir_url = 'http://fhir-server:8080/fhir'
-    keycloak_url = 'http://keycloak-http'
-    ca_certificates = 'ingress-ca-certificate'
-    minio_certificate = 'minio-ca-certificate'
-else:
-    raise AirflowConfigException(f'Unexpected environment "{env}"')
+kube_config = KubeConfig(
+    in_cluster = Variable.get('k8s_in_cluster', True),
+    namespace = Variable.get('k8s_namespace', None),
+    service_account_name = Variable.get('k8s_service_account_name'),
+    image_pull_secrets_name = Variable.get('k8s_image_pull_secret_name', None),   
+)
 
-obo_parser_jar = f'https://github.com/Ferlab-Ste-Justine/obo-parser/releases/download/{obo_parser_jar_version}/obo-parser.jar'
+spark_default_conf = {
+ 'spark.jars.packages': 'org.apache.hadoop:hadoop-aws:3.3.4,io.delta:delta-core_2.12:2.4.0',
+ 'spark.sql.shuffle.partitions' : '1000',
+ 'spark.sql.extensions' : 'io.delta.sql.DeltaSparkSessionExtension',
+ 'spark.sql.catalog.spark_catalog' : 'org.apache.spark.sql.delta.catalog.DeltaCatalog',
+ 'spark.hadoop.fs.s3a.impl' : 'org.apache.hadoop.fs.s3a.S3AFileSystem',
+ 'spark.hadoop.fs.s3a.fast.upload' : 'true',
+ 'spark.hadoop.fs.s3a.connection.ssl.enabled' : 'true',
+ 'spark.hadoop.fs.s3a.path.style.access' : 'true',
+ 'spark.hadoop.fs.s3a.endpoint' : aws_endpoint,
+ 'spark.hadoop.fs.s3a.aws.credentials.provider' : 'com.amazonaws.auth.EnvironmentVariableCredentialsProvider',
+ 'spark.kubernetes.driver.secretKeyRef.AWS_ACCESS_KEY_ID' : f'{aws_secret_name}:{aws_secret_access_key}',
+ 'spark.kubernetes.driver.secretKeyRef.AWS_SECRET_ACCESS_KEY' : f'{aws_secret_name}:{aws_secret_secret_key}',
+ 'spark.kubernetes.executor.secretKeyRef.AWS_ACCESS_KEY_ID' : f'{aws_secret_name}:{aws_secret_access_key}',
+ 'spark.kubernetes.executor.secretKeyRef.AWS_SECRET_ACCESS_KEY' : f'{aws_secret_name}:{aws_secret_secret_key}', 
+ 'spark.hadoop.hive.metastore.uris' : hive_metastore_uri,
+ 'spark.sql.warehouse.dir' : f's3a://{datalake_bucket}/hive',
+ 'spark.eventLog.enabled' : 'true',
+ 'spark.eventLog.dir' : f's3a://{datalake_bucket}/spark-logs',
+ 'spark.driver.extraJavaOptions' : '"-Divy.cache.dir=/tmp -Divy.home=/tmp"',
+ 'spark.jars.ivy': '/tmp'
+}
 
-def env_url(prefix: str = '') -> str:
-    return f'{prefix}{env}' if env in [Env.QA, Env.DEV] else ''
+spark_small_conf = {
+ 'spark.driver.memory' : '16g',
+ 'spark.driver.cores' : '6',
+ 'spark.executor.instances' : '1',
+ 'spark.executor.memory' : '16g',
+ 'spark.memory.fraction' : '0.9',
+ 'spark.memory.storageFraction' : '0.1',
+ 'spark.executor.cores' : '12',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.options.sizeLimit' : '50Gi',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.path' : '/data',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.readOnly' : 'false',
+}
+
+spark_medium_conf = {
+ 'spark.driver.memory' : '16g',
+ 'spark.driver.cores' : '6',
+ 'spark.executor.instances' : '2',
+ 'spark.executor.memory' : '16g',
+ 'spark.memory.fraction' : '0.9',
+ 'spark.memory.storageFraction' : '0.1',
+ 'spark.executor.cores' : '12',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.options.sizeLimit' : '350Gi',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.path' : '/data',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.readOnly' : 'false',
+}
+
+spark_large_conf = {
+ 'spark.driver.memory' : '70g',
+ 'spark.driver.cores' : '12',
+ 'spark.executor.instances' : '20',
+ 'spark.executor.memory' : '64g',
+ 'spark.memory.fraction' : '0.9',
+ 'spark.memory.storageFraction' : '0.1',
+ 'spark.executor.cores' : '12',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.options.sizeLimit' : '350Gi',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.path' : '/data',
+ 'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.readOnly' : 'false',
+}
+spark_index_conf = {
+    'spark.kubernetes.driver.podTemplateFile': 'local:///app/pod-template-es-cert.yml',
+    'spark.driver.extraJavaOptions': '-Divy.cache.dir=/tmp -Divy.home=/tmp -Djavax.net.ssl.trustStore=/opt/keystores/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit',
+    'spark.kubernetes.driver.secretKeyRef.ES_USERNAME': f'{es_credentials_secret_name}:{es_credentials_secret_key_username}',
+    'spark.kubernetes.driver.secretKeyRef.ES_PASSWORD': f'{es_credentials_secret_name}:{es_credentials_secret_key_password}',
+    'spark.kubernetes.executor.podTemplateFile': 'local:///app/pod-template-es-cert.yml',
+    'spark.executor.extraJavaOptions': '-Divy.cache.dir=/tmp -Divy.home=/tmp -Djavax.net.ssl.trustStore=/opt/keystores/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit',
+    'spark.kubernetes.executor.secretKeyRef.ES_USERNAME': f'{es_credentials_secret_name}:{es_credentials_secret_key_username}',
+    'spark.kubernetes.executor.secretKeyRef.ES_PASSWORD': f'{es_credentials_secret_name}:{es_credentials_secret_key_password}' 
+}    
+
+variant_jar = 'local:///app/variant-task.jar'
+prepare_index_jar = 'local:///app/prepare-index.jar'
+import_jar = 'local:///app/import-task.jar'
+index_jar = 'local:///app/index-task.jar'
+publish_jar = 'local:///app/publish-task.jar'
+
+etl_base_config = SparkOperatorConfig(
+    spark_configs=[spark_default_conf],
+    image = Variable.get('etl_image'),
+    kube_config=kube_config,
+    is_delete_operator_pod=False
+)
+
+etl_index_config = etl_base_config \
+    .add_spark_conf(spark_small_conf, spark_index_conf) \
+    .with_spark_jar(index_jar) 
+
+etl_publish_config = etl_base_config \
+    .add_spark_conf(spark_small_conf, spark_index_conf) \
+    .with_spark_jar(publish_jar) \
+    .with_spark_class('bio.ferlab.fhir.etl.PublishTask')
+
+etl_variant_config = etl_base_config \
+    .add_spark_conf(spark_large_conf) \
+    .with_spark_jar(variant_jar) 
 
 
-def k8s_in_cluster(context: str) -> bool:
-    return not k8s_context[context]
 
 
-def k8s_config_file(context: str) -> str:
-    return None if not k8s_context[context] else '~/.kube/config'
-
-
-def k8s_cluster_context(context: str) -> str:
-    return k8s_context[context]
-
-
-def k8s_load_config(context: str) -> None:
-    if not k8s_context[context]:
-        kubernetes.config.load_incluster_config()
-    else:
-        kubernetes.config.load_kube_config(
-            config_file=k8s_config_file(context),
-            context=k8s_context[context],
-        )

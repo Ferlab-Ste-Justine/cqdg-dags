@@ -1,173 +1,112 @@
-import time
-
 import kubernetes
 import logging
 from airflow.exceptions import AirflowFailException
 from airflow.exceptions import AirflowSkipException
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
-from lib import config
-from lib.config import env
-from typing import List
+from typing import Optional, List, Type
+from collections import ChainMap
+import copy
+from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig
+from typing_extensions import Self
+from dataclasses import dataclass, field
 
-from dags.lib.config import Env
-
-
-class SparkOperator(KubernetesPodOperator):
-
+class SparkOperator(BaseKubernetesOperator):
+    template_fields = [*BaseKubernetesOperator.template_fields, 'spark_jar', 'spark_class', 'spark_configs', 'spark_packages']
     def __init__(
             self,
-            k8s_context: str,
-            spark_jar: str,
-            spark_class: str,
-            spark_config: str = '',
-            spark_secret: str = '',
-            skip_env: List[str] = [],
-            skip_fail_env: List[str] = [],
-            **kwargs,
+            spark_class: Optional[str] = None,
+            spark_jar: Optional[str] = None,
+            spark_configs: List[dict] = [],
+            spark_config_volume: Optional[str] = None,
+            spark_packages: List[str] = [],
+            is_skip: bool = False,
+            is_skip_fail: bool = False,
+
+            **kwargs
     ) -> None:
-        super().__init__(
-            is_delete_operator_pod=True,
-            in_cluster=config.k8s_in_cluster(k8s_context),
-            cluster_context=config.k8s_cluster_context(k8s_context),
-            namespace=config.k8s_namespace,
-            service_account_name=config.spark_service_account,
-            image=config.spark_image,
-            **kwargs,
+        super().__init__(                
+            **kwargs
         )
-        self.k8s_context = k8s_context
         self.spark_class = spark_class
         self.spark_jar = spark_jar
-        self.spark_config = spark_config
-        self.spark_secret = spark_secret
-        self.skip_env = skip_env
-        self.skip_fail_env = skip_fail_env
+        self.spark_configs = spark_configs
+        self.spark_config_volume = spark_config_volume
+        self.spark_packages = spark_packages
+        self.is_skip = is_skip
+        self.is_skip_fail = is_skip_fail
+
 
     def execute(self, **kwargs):
-        if env in self.skip_env:
+
+        if self.is_skip:
             raise AirflowSkipException()
 
-        self.cmds = ['/opt/client-entrypoint.sh']
-        self.image_pull_policy = 'Always'
-        self.image_pull_secrets = [
-            k8s.V1LocalObjectReference(
-                name='images-registry-credentials',
-            ),
-        ]
-        self.env_vars = [
+        # Driver pod name
+        self.env_vars.append(
             k8s.V1EnvVar(
                 name='SPARK_CLIENT_POD_NAME',
                 value_from=k8s.V1EnvVarSource(
                     field_ref=k8s.V1ObjectFieldSelector(
                         field_path='metadata.name',
                     ),
-                ),
-            ),
-            k8s.V1EnvVar(
-                name='AWS_ENDPOINT',
-                value='https://objets.juno.calculquebec.ca',
-            ),
-            k8s.V1EnvVar(
-                name='SPARK_JAR',
-                value=self.spark_jar,
-            ),
-            k8s.V1EnvVar(
-                name='SPARK_CLASS',
-                value=self.spark_class,
-            ),
-            k8s.V1EnvVar(
-                name='ES_USERNAME',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='opensearch-dags-credentials',
-                        key='username',
-                    ),
-                ),
-            ),
-            k8s.V1EnvVar(
-                name='ES_PASSWORD',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='opensearch-dags-credentials',
-                        key='password',
-                    ),
-                ),
-            ),
-        ]
-        self.volumes = [
-            k8s.V1Volume(
-                name='spark-defaults',
-                config_map=k8s.V1ConfigMapVolumeSource(
-                    name='spark-defaults',
-                ),
-            ),
-            k8s.V1Volume(
-                name='spark-s3-credentials',
-                secret=k8s.V1SecretVolumeSource(
-                    secret_name='spark-s3-credentials',
-                ),
-            ),
-        ]
-
-        self.volumes.append(
-            k8s.V1Volume(
-                name='opensearch-ca-certificate',
-                secret=k8s.V1SecretVolumeSource(
-                    secret_name='opensearch-ca-certificate',
-                ),
-            ),
+                )                
+            )
         )
-
-        self.volume_mounts = [
-            k8s.V1VolumeMount(
-                name='spark-defaults',
-                mount_path='/opt/spark-configs/defaults',
-                read_only=True,
-            ),
-            k8s.V1VolumeMount(
-                name='spark-s3-credentials',
-                mount_path='/opt/spark-configs/s3-credentials',
-                read_only=True,
-            ),
-        ]
-
-        self.volume_mounts.append(
-            k8s.V1VolumeMount(
-                name='opensearch-ca-certificate',
-                mount_path='/opt/es-ca',
-                read_only=True,
-            ),
+        self.env_vars.append(
+            k8s.V1EnvVar(
+                name='SPARK_CLIENT_NAMESPACE',
+                value_from=k8s.V1EnvVarSource(
+                    field_ref=k8s.V1ObjectFieldSelector(
+                        field_path='metadata.namespace',
+                    ),
+                )                
+            )
         )
+        
+        driver_pod_name_config = ['--conf','spark.kubernetes.driver.pod.name=$(SPARK_CLIENT_POD_NAME)-driver']
+        
+        # Build --conf attributes
+        spark_config_reversed = reversed(self.spark_configs)
+        merged_config = dict(ChainMap(*spark_config_reversed))
+        
+        if 'spark.kubernetes.driver.container.image' not in merged_config.keys() and 'spark.kubernetes.container.image' not in merged_config.keys():
+            merged_config['spark.kubernetes.driver.container.image']=  self.image
+        if 'spark.kubernetes.executor.container.image' not in merged_config.keys() and 'spark.kubernetes.container.image' not in merged_config.keys():
+            merged_config['spark.kubernetes.executor.container.image'] = self.image
+        if 'spark.master' not in merged_config.keys():
+            merged_config['spark.master'] = 'k8s://https://kubernetes.default.svc'
+        if 'spark.kubernetes.namespace' not in merged_config.keys():
+            merged_config['spark.kubernetes.namespace'] = '$(SPARK_CLIENT_NAMESPACE)'
+        if 'spark.kubernetes.authenticate.driver.serviceAccountName' not in merged_config.keys():
+            merged_config['spark.kubernetes.authenticate.driver.serviceAccountName'] = self.service_account_name
 
-        if self.spark_config:
+        merged_config['spark.submit.deployMode'] = 'cluster'
+
+        merged_config_attributes = [['--conf', f'{k}={v}'] for k,v in merged_config.items()]
+        merged_config_attributes = sum(merged_config_attributes, []) # flatten
+        
+        # Build --packages attribute
+        spark_packages_attributes = ['--packages', ','.join(self.spark_packages)] if self.spark_packages else []
+
+        # CMD
+        self.cmds = ['/opt/spark/bin/spark-submit']
+        
+        self.arguments = [*spark_packages_attributes, *driver_pod_name_config, *merged_config_attributes, '--class', self.spark_class, self.spark_jar, *self.arguments]
+
+        # Mount additional config volume
+        if self.spark_config_volume:
             self.volumes.append(
                 k8s.V1Volume(
-                    name=self.spark_config,
+                    name='spark_config_volume',
                     config_map=k8s.V1ConfigMapVolumeSource(
-                        name=self.spark_config,
+                        name=self.spark_config_volume,
                     ),
                 ),
             )
             self.volume_mounts.append(
                 k8s.V1VolumeMount(
-                    name=self.spark_config,
-                    mount_path=f'/opt/spark-configs/{self.spark_config}',
-                    read_only=True,
-                ),
-            )
-        if self.spark_secret:
-            self.volumes.append(
-                k8s.V1Volume(
-                    name=self.spark_secret,
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name=self.spark_secret,
-                    ),
-                ),
-            )
-            self.volume_mounts.append(
-                k8s.V1VolumeMount(
-                    name=self.spark_secret,
-                    mount_path=f'/opt/spark-configs/{self.spark_secret}',
+                    name='spark_config_volume',
+                    mount_path=f'/opt/spark/conf',
                     read_only=True,
                 ),
             )
@@ -208,7 +147,71 @@ class SparkOperator(KubernetesPodOperator):
 
         # Fail task if driver pod failed
         if driver_pod.items[0].status.phase != 'Succeeded':
-            if env in self.skip_fail_env:
+            if self.is_skip_fail:
                 raise AirflowSkipException()
             else:
                 raise AirflowFailException('Spark job failed')
+
+@dataclass            
+class SparkOperatorConfig(BaseConfig):
+    spark_class: Optional[str] = None
+    spark_jar: Optional[str] = None
+    spark_configs: List[dict] = field(default_factory=list) 
+    spark_config_volume: Optional[str] = None
+    spark_packages: List[str] = field(default_factory=list)
+    is_skip: bool = False
+    is_skip_fail: bool = False    
+    
+    def add_spark_conf(self, *new_config) -> Self:
+        c = copy.copy(self)
+        c.spark_configs = [*self.spark_configs, *new_config]
+        return c
+
+    def add_package(self, new_package: str) -> Self:
+        c = copy.copy(self)
+        c.spark_packages = [*self.spark_packages, new_package]
+        return c
+    
+    def skip(self) -> Self:
+        c = copy.copy(self)
+        c.is_skip = True
+        return c
+    
+    def skip_fail(self) -> Self:
+        c = copy.copy(self)
+        c.is_skip_fail = True
+        return c    
+
+    def skip_all(self) -> Self:
+        c = copy.copy(self)
+        c.is_skip = True
+        c.is_skip_fail = True
+        return c 
+       
+    def delete(self) -> Self:
+        c = copy.copy(self)
+        c.is_delete = True
+        return c 
+    
+    def with_spark_class(self, spark_class: str) -> Self:
+        c = copy.copy(self)
+        c.spark_class = spark_class
+        return c
+    
+    def with_spark_jar(self, spark_jar:str) -> Self:
+        c = copy.copy(self)
+        c.spark_jar = spark_jar
+        return c 
+
+    def with_image(self, image: str) -> Self:
+        c = copy.copy(self)
+        c.image = image
+        return c            
+    
+    def with_spark_config_volume(self, spark_config_volume: str) -> Self:
+        c = copy.copy(self)
+        c.spark_config_volume = spark_config_volume
+        return c      
+
+    def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator,**kwargs) -> SparkOperator:
+        return super().build_operator(class_to_instantiate=class_to_instantiate, **kwargs)

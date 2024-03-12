@@ -6,7 +6,7 @@ from airflow.decorators import task
 from airflow.exceptions import ParamValidationError
 from airflow.models import Param, TaskInstance, DagRun
 
-from lib.config import default_config_file, default_params, K8sContext, variant_task_jar
+from lib.config import spark_small_conf, default_config_file, default_params, variant_jar, etl_base_config
 from lib.operators.spark import SparkOperator
 
 # Update default params
@@ -21,11 +21,12 @@ params.update({
 })
 
 with DAG(
-        dag_id='create_tables',
+        dag_id='create-tables',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params=params,
 ) as dag:
+    
     @task(task_id='get_dataset_ids')
     def get_dataset_ids(**kwargs) -> List[str]:
         ti: TaskInstance = kwargs['ti']
@@ -41,7 +42,7 @@ with DAG(
 
 
     class CreateTableAndView(SparkOperator):
-        template_fields = SparkOperator.template_fields + ('arguments', 'dataset_ids',)
+        template_fields = [*SparkOperator.template_fields,'arguments', 'dataset_ids']
 
         def __init__(self,
                      dataset_ids,
@@ -55,15 +56,16 @@ with DAG(
             self.arguments = self.arguments + self.dataset_ids
             super().execute(**kwargs)
 
-
-    CreateTableAndView(task_id='create_table_and_view',
-                       name='create-table-and-view',
-                       k8s_context=K8sContext.DEFAULT,
-                       spark_jar=variant_task_jar,
-                       spark_class='bio.ferlab.datalake.spark3.hive.CreateTableAndView',
-                       spark_config='etl-task-small',
-                       arguments=['--config', default_config_file,
-                                  '--steps', 'default',
-                                  '--app-name', 'create_table_and_view',
-                                  ],
-                       dataset_ids=get_dataset_ids())
+    etl_base_config.add_spark_conf(spark_small_conf) \
+                    .with_spark_class('bio.ferlab.datalake.spark3.hive.CreateTableAndView') \
+                    .with_spark_jar(variant_jar) \
+                    .args('--config', default_config_file,
+                          '--steps', 'default',
+                          '--app-name', 'create_table_and_view'
+                    ).operator(
+                        class_to_instantiate=CreateTableAndView, 
+                        task_id = 'create_table_and_view', 
+                        name = 'create-table-and-view', 
+                        dataset_ids=get_dataset_ids()
+                    )
+    
