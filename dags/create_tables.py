@@ -26,7 +26,6 @@ with DAG(
         schedule_interval=None,
         params=params,
 ) as dag:
-    
     @task(task_id='get_dataset_ids')
     def get_dataset_ids(**kwargs) -> List[str]:
         ti: TaskInstance = kwargs['ti']
@@ -42,7 +41,7 @@ with DAG(
 
 
     class CreateTableAndView(SparkOperator):
-        template_fields = [*SparkOperator.template_fields,'arguments', 'dataset_ids']
+        template_fields = [*SparkOperator.template_fields, 'arguments', 'dataset_ids']
 
         def __init__(self,
                      dataset_ids,
@@ -56,16 +55,16 @@ with DAG(
             self.arguments = self.arguments + self.dataset_ids
             super().execute(**kwargs)
 
+
     etl_base_config.add_spark_conf(spark_small_conf) \
-                    .with_spark_class('bio.ferlab.datalake.spark3.hive.CreateTableAndView') \
-                    .with_spark_jar(variant_jar) \
-                    .args('--config', default_config_file,
-                          '--steps', 'default',
-                          '--app-name', 'create_table_and_view'
-                    ).operator(
-                        class_to_instantiate=CreateTableAndView, 
-                        task_id = 'create_table_and_view', 
-                        name = 'create-table-and-view', 
-                        dataset_ids=get_dataset_ids()
-                    )
-    
+        .with_spark_class('bio.ferlab.datalake.spark3.hive.CreateTableAndView') \
+        .with_spark_jar(variant_jar) \
+        .args('--config', default_config_file,
+              '--steps', 'default',
+              '--app-name', 'create_table_and_view'
+              ).operator(
+        class_to_instantiate=CreateTableAndView,
+        task_id='create_table_and_view',
+        name='create-table-and-view',
+        dataset_ids=get_dataset_ids()
+    )

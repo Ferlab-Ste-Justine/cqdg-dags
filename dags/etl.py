@@ -23,7 +23,7 @@ with DAG(
 ) as dag:
 
     with TaskGroup(group_id='index') as index:
-        index_operator('study') >> index_operator('participant') >> index_operator('file') >>  index_operator('biospecimen') 
+        index_operator('study') >> index_operator('participant') >> index_operator('file') >> index_operator('biospecimen')
 
     with TaskGroup(group_id='publish') as publish:
        def publish_operator(name:str):
