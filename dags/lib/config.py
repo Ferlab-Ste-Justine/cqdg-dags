@@ -135,8 +135,7 @@ publish_jar = 'local:///app/publish-task.jar'
 etl_base_config = SparkOperatorConfig(
     spark_configs=[spark_default_conf],
     image=Variable.get('etl_image'),
-    kube_config=kube_config,
-    is_delete_operator_pod=False
+    kube_config=kube_config
 )
 
 etl_deps_config = etl_base_config.add_packages('org.apache.hadoop:hadoop-aws:3.3.4','io.delta:delta-core_2.12:2.4.0')

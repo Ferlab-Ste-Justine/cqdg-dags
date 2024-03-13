@@ -12,8 +12,6 @@ class KubeConfig:
     service_account_name: Optional[str] = None
     image_pull_secrets_name: Optional[str] = None    
 
-
-          
 class BaseKubernetesOperator(KubernetesPodOperator):
     template_fields = [*KubernetesPodOperator.template_fields, 'image_pull_secrets_name']
     def __init__(
@@ -52,7 +50,7 @@ def required() -> T:
 @dataclass          
 class BaseConfig:
     kube_config: KubeConfig
-    is_delete_operator_pod: bool = True
+    is_delete_operator_pod: bool = False
     image: Optional[str] = None
     arguments: List[str] = field(default_factory=list)    
 
