@@ -1,10 +1,7 @@
-import kubernetes
-from airflow.exceptions import AirflowConfigException
 from airflow.models import Variable, Param
-from lib.operators.spark import SparkOperatorConfig
+
 from lib.operators.base_kubernetes import KubeConfig
-from lib.operators.fhavro import FhavroConfig
-from lib.operators.fhir_import import FhirCsvConfig
+from lib.operators.spark import SparkOperatorConfig
 
 
 class Env:
@@ -45,7 +42,6 @@ default_params = {
 study_id = '{{ params.study_id }}'
 study_ids = '{{ params.study_ids }}'
 project = '{{ params.project }}'
-project = '{{ params.project }}'
 dataset = '{{ params.dataset }}'
 batch = '{{ params.batch }}'
 release_id = '{{ params.release_id }}'
@@ -60,7 +56,6 @@ kube_config = KubeConfig(
 )
 
 spark_default_conf = {
-    'spark.jars.packages': 'org.apache.hadoop:hadoop-aws:3.3.4,io.delta:delta-core_2.12:2.4.0',
     'spark.sql.shuffle.partitions': '1000',
     'spark.sql.extensions': 'io.delta.sql.DeltaSparkSessionExtension',
     'spark.sql.catalog.spark_catalog': 'org.apache.spark.sql.delta.catalog.DeltaCatalog',
@@ -144,15 +139,17 @@ etl_base_config = SparkOperatorConfig(
     is_delete_operator_pod=False
 )
 
-etl_index_config = etl_base_config \
+etl_deps_config = etl_base_config.add_packages('org.apache.hadoop:hadoop-aws:3.3.4','io.delta:delta-core_2.12:2.4.0')
+
+etl_index_config = etl_deps_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(index_jar)
 
-etl_publish_config = etl_base_config \
+etl_publish_config = etl_deps_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(publish_jar) \
     .with_spark_class('bio.ferlab.fhir.etl.PublishTask')
 
-etl_variant_config = etl_base_config \
+etl_variant_config = etl_deps_config \
     .add_spark_conf(spark_large_conf) \
     .with_spark_jar(variant_jar)

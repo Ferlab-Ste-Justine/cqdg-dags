@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
 from lib.config import default_config_file, study_ids
-from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
+from etl_prepare_index import etl_deps_config, spark_small_conf, prepare_index_jar
 
 with DAG(
         dag_id='etl-enrich-specimen',
@@ -14,7 +14,7 @@ with DAG(
         },
 ) as dag:
 
-    etl_base_config \
+    etl_deps_config \
         .add_spark_conf(spark_small_conf) \
         .with_spark_jar(prepare_index_jar) \
         .with_spark_class('bio.ferlab.fhir.etl.Enrich') \

@@ -6,7 +6,7 @@ from airflow.decorators import task
 from airflow.exceptions import ParamValidationError
 from airflow.models import Param, TaskInstance, DagRun
 
-from lib.config import spark_small_conf, default_config_file, default_params, variant_jar, etl_base_config
+from lib.config import spark_small_conf, default_config_file, default_params, variant_jar, etl_deps_config
 from lib.operators.spark import SparkOperator
 
 # Update default params
@@ -56,7 +56,7 @@ with DAG(
             super().execute(**kwargs)
 
 
-    etl_base_config.add_spark_conf(spark_small_conf) \
+    etl_deps_config.add_spark_conf(spark_small_conf) \
         .with_spark_class('bio.ferlab.datalake.spark3.hive.CreateTableAndView') \
         .with_spark_jar(variant_jar) \
         .args('--config', default_config_file,

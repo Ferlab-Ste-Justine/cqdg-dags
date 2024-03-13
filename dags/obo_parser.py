@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.models import Variable, Param
 from datetime import datetime
-from lib.config import datalake_bucket, etl_base_config, spark_small_conf
+from lib.config import datalake_bucket, etl_deps_config, spark_small_conf
 from lib.operators.spark import SparkOperator
 
 with DAG(
@@ -26,7 +26,7 @@ with DAG(
     def required_top_node() -> str:
         return '{{ params.required_top_node }}'
 
-    import_task = etl_base_config \
+    import_task = etl_deps_config \
                     .with_image(Variable.get('obo_parser_image')) \
                     .add_spark_conf(spark_small_conf) \
                     .with_spark_jar('local:///app/obo-parser.jar') \

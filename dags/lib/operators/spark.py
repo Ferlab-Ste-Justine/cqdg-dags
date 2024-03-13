@@ -10,8 +10,11 @@ from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig
 from typing_extensions import Self
 from dataclasses import dataclass, field
 
+
 class SparkOperator(BaseKubernetesOperator):
-    template_fields = [*BaseKubernetesOperator.template_fields, 'spark_jar', 'spark_class', 'spark_configs', 'spark_packages']
+    template_fields = [*BaseKubernetesOperator.template_fields, 'spark_jar', 'spark_class', 'spark_configs',
+                       'spark_packages']
+
     def __init__(
             self,
             spark_class: Optional[str] = None,
@@ -24,7 +27,7 @@ class SparkOperator(BaseKubernetesOperator):
 
             **kwargs
     ) -> None:
-        super().__init__(                
+        super().__init__(
             **kwargs
         )
         self.spark_class = spark_class
@@ -34,7 +37,6 @@ class SparkOperator(BaseKubernetesOperator):
         self.spark_packages = spark_packages
         self.is_skip = is_skip
         self.is_skip_fail = is_skip_fail
-
 
     def execute(self, **kwargs):
 
@@ -49,7 +51,7 @@ class SparkOperator(BaseKubernetesOperator):
                     field_ref=k8s.V1ObjectFieldSelector(
                         field_path='metadata.name',
                     ),
-                )                
+                )
             )
         )
         self.env_vars.append(
@@ -59,18 +61,18 @@ class SparkOperator(BaseKubernetesOperator):
                     field_ref=k8s.V1ObjectFieldSelector(
                         field_path='metadata.namespace',
                     ),
-                )                
+                )
             )
         )
-        
-        driver_pod_name_config = ['--conf','spark.kubernetes.driver.pod.name=$(SPARK_CLIENT_POD_NAME)-driver']
-        
+
+        driver_pod_name_config = ['--conf', 'spark.kubernetes.driver.pod.name=$(SPARK_CLIENT_POD_NAME)-driver']
+
         # Build --conf attributes
         spark_config_reversed = reversed(self.spark_configs)
         merged_config = dict(ChainMap(*spark_config_reversed))
-        
+
         if 'spark.kubernetes.driver.container.image' not in merged_config.keys() and 'spark.kubernetes.container.image' not in merged_config.keys():
-            merged_config['spark.kubernetes.driver.container.image']=  self.image
+            merged_config['spark.kubernetes.driver.container.image'] = self.image
         if 'spark.kubernetes.executor.container.image' not in merged_config.keys() and 'spark.kubernetes.container.image' not in merged_config.keys():
             merged_config['spark.kubernetes.executor.container.image'] = self.image
         if 'spark.master' not in merged_config.keys():
@@ -82,16 +84,17 @@ class SparkOperator(BaseKubernetesOperator):
 
         merged_config['spark.submit.deployMode'] = 'cluster'
 
-        merged_config_attributes = [['--conf', f'{k}={v}'] for k,v in merged_config.items()]
-        merged_config_attributes = sum(merged_config_attributes, []) # flatten
-        
+        merged_config_attributes = [['--conf', f'{k}={v}'] for k, v in merged_config.items()]
+        merged_config_attributes = sum(merged_config_attributes, [])  # flatten
+
         # Build --packages attribute
         spark_packages_attributes = ['--packages', ','.join(self.spark_packages)] if self.spark_packages else []
 
         # CMD
         self.cmds = ['/opt/spark/bin/spark-submit']
-        
-        self.arguments = [*spark_packages_attributes, *driver_pod_name_config, *merged_config_attributes, '--class', self.spark_class, self.spark_jar, *self.arguments]
+
+        self.arguments = [*spark_packages_attributes, *driver_pod_name_config, *merged_config_attributes, '--class',
+                          self.spark_class, self.spark_jar, *self.arguments]
 
         # Mount additional config volume
         if self.spark_config_volume:
@@ -152,16 +155,17 @@ class SparkOperator(BaseKubernetesOperator):
             else:
                 raise AirflowFailException('Spark job failed')
 
-@dataclass            
+
+@dataclass
 class SparkOperatorConfig(BaseConfig):
     spark_class: Optional[str] = None
     spark_jar: Optional[str] = None
-    spark_configs: List[dict] = field(default_factory=list) 
+    spark_configs: List[dict] = field(default_factory=list)
     spark_config_volume: Optional[str] = None
     spark_packages: List[str] = field(default_factory=list)
     is_skip: bool = False
-    is_skip_fail: bool = False    
-    
+    is_skip_fail: bool = False
+
     def add_spark_conf(self, *new_config) -> Self:
         c = copy.copy(self)
         c.spark_configs = [*self.spark_configs, *new_config]
@@ -171,47 +175,52 @@ class SparkOperatorConfig(BaseConfig):
         c = copy.copy(self)
         c.spark_packages = [*self.spark_packages, new_package]
         return c
-    
+
+    def add_packages(self, *new_packages) -> Self:
+        c = copy.copy(self)
+        c.spark_packages = [*self.spark_packages, *new_packages]
+        return c
+
     def skip(self) -> Self:
         c = copy.copy(self)
         c.is_skip = True
         return c
-    
+
     def skip_fail(self) -> Self:
         c = copy.copy(self)
         c.is_skip_fail = True
-        return c    
+        return c
 
     def skip_all(self) -> Self:
         c = copy.copy(self)
         c.is_skip = True
         c.is_skip_fail = True
-        return c 
-       
+        return c
+
     def delete(self) -> Self:
         c = copy.copy(self)
         c.is_delete = True
-        return c 
-    
+        return c
+
     def with_spark_class(self, spark_class: str) -> Self:
         c = copy.copy(self)
         c.spark_class = spark_class
         return c
-    
-    def with_spark_jar(self, spark_jar:str) -> Self:
+
+    def with_spark_jar(self, spark_jar: str) -> Self:
         c = copy.copy(self)
         c.spark_jar = spark_jar
-        return c 
+        return c
 
     def with_image(self, image: str) -> Self:
         c = copy.copy(self)
         c.image = image
-        return c            
-    
+        return c
+
     def with_spark_config_volume(self, spark_config_volume: str) -> Self:
         c = copy.copy(self)
         c.spark_config_volume = spark_config_volume
-        return c      
+        return c
 
-    def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator,**kwargs) -> SparkOperator:
+    def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator, **kwargs) -> SparkOperator:
         return super().build_operator(class_to_instantiate=class_to_instantiate, **kwargs)
