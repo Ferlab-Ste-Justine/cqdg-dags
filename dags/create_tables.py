@@ -34,25 +34,23 @@ with DAG(
         if 'dataset_ids' not in dag_run.conf or dag_run.conf['dataset_ids'] == []:
             raise ParamValidationError('Dag param "dataset_ids" is required')
 
-        dataset_ids_args = []
-        dataset_ids = dag_run.conf['dataset_ids']
-        [dataset_ids_args.extend(['--dataset_id', d]) for d in dataset_ids]
-        return dataset_ids_args
+        return dag_run.conf['dataset_ids']
 
 
     class CreateTableAndView(SparkOperator):
-        template_fields = [*SparkOperator.template_fields, 'arguments', 'dataset_ids']
+        template_fields = [*SparkOperator.template_fields, 'arguments', 'dataset_id']
 
         def __init__(self,
-                     dataset_ids,
+                     dataset_id,
                      **kwargs):
             super().__init__(**kwargs)
-            self.dataset_ids = dataset_ids
+            self.dataset_id = dataset_id
 
         def execute(self, **kwargs):
             # Append dataset_ids to arguments at runtime, after dataset_ids has been templated. Otherwise, dataset_ids
             # is interpreted as XComArg and can't be appended to arguments.
-            self.arguments = self.arguments + self.dataset_ids
+            self.arguments.append('--dataset_id')
+            self.arguments.append(self.dataset_id)
             super().execute(**kwargs)
 
 
@@ -62,9 +60,10 @@ with DAG(
         .args('--config', default_config_file,
               '--steps', 'default',
               '--app-name', 'create_table_and_view'
-              ).operator(
-        class_to_instantiate=CreateTableAndView,
-        task_id='create_table_and_view',
-        name='create-table-and-view',
-        dataset_ids=get_dataset_ids()
-    )
+              ) \
+        .partial(
+            class_to_instantiate=CreateTableAndView,
+            task_id='create_table_and_view',
+            name='create-table-and-view'
+        ) \
+        .expand(dataset_id=get_dataset_ids())

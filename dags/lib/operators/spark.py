@@ -8,7 +8,7 @@ from collections import ChainMap
 import copy
 from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig
 from typing_extensions import Self
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 
 
 class SparkOperator(BaseKubernetesOperator):
@@ -222,5 +222,5 @@ class SparkOperatorConfig(BaseConfig):
         c.spark_config_volume = spark_config_volume
         return c
 
-    def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator, **kwargs) -> SparkOperator:
+    def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator, **kwargs) -> BaseKubernetesOperator:
         return super().build_operator(class_to_instantiate=class_to_instantiate, **kwargs)

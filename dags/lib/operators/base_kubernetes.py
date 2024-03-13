@@ -62,8 +62,13 @@ class BaseConfig:
     def prepend_args(self, *new_args) -> Self:
         c = copy.copy(self)
         c.arguments = [*new_args, *self.arguments]
-        return c            
-    
+        return c
+
+    def with_image(self, new_image) -> Self:
+        c = copy.copy(self)
+        c.image = new_image
+        return c
+
     def build_operator(self, class_to_instantiate: Type[BaseKubernetesOperator], **kwargs) -> BaseKubernetesOperator:
         this_params = asdict(self)
         this_params.pop('kube_config', None)
@@ -74,9 +79,15 @@ class BaseConfig:
             namespace = self.kube_config.namespace,
             service_account_name = self.kube_config.service_account_name,          
             **params
-        )          
-    
-    def with_image(self, new_image) -> Self:
-        c = copy.copy(self)
-        c.image = new_image
-        return c
+        )
+    def partial(self, class_to_instantiate: Type[BaseKubernetesOperator] = BaseKubernetesOperator, **kwargs):
+        this_params = asdict(self)
+        this_params.pop('kube_config', None)
+        params = {**this_params, **kwargs}
+        return class_to_instantiate.partial(
+            in_cluster = self.kube_config.in_cluster,
+            cluster_context = self.kube_config.cluster_context,
+            namespace = self.kube_config.namespace,
+            service_account_name = self.kube_config.service_account_name,
+            **params
+        )
