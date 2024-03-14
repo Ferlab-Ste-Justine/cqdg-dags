@@ -141,7 +141,7 @@ etl_base_config = SparkOperatorConfig(
     spark_configs=[spark_default_conf],
     image=Variable.get('etl_image'),
     kube_config=kube_config
-).add_packages('org.apache.hadoop:hadoop-aws:3.3.4', 'io.delta:delta-core_2.12:2.4.0')
+).add_packages('org.apache.hadoop:hadoop-aws:3.3.4', 'io.delta:delta-spark_2.12:3.1.0')
 
 etl_index_config = etl_base_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
