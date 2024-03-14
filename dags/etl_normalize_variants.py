@@ -19,7 +19,11 @@ normalized_etl = etl_variant_config \
         '--study-code', '{{ params.study_code }}'
     ) \
     .add_package('io.projectglow:glow-spark3_2.12:2.0.0') \
-    .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client'}, spark_large_conf)
+    .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client,'
+                                            'io.netty:netty-all,'
+                                            'io.netty:netty-handler,'
+                                            'io.netty:netty-transport-native-epoll'},
+                    spark_large_conf)
 
 
 def normalize_variant_operator(name):
