@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from lib.config import default_config_file, etl_deps_config, spark_medium_conf, variant_jar, study_id, dataset, batch
+from lib.config import default_config_file, etl_base_config, spark_medium_conf, variant_jar, study_id, dataset, batch
 
 with DAG(
         dag_id='etl-enrich-snv',
@@ -16,7 +16,7 @@ with DAG(
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
-    variant_task_enrich_snv = etl_deps_config \
+    variant_task_enrich_snv = etl_base_config \
         .with_spark_jar(variant_jar) \
         .with_spark_class('bio.ferlab.etl.enriched.RunEnrichGenomic') \
         .add_spark_conf(spark_medium_conf) \

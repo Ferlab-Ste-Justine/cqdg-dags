@@ -55,6 +55,7 @@ kube_config = KubeConfig(
     cluster_context=Variable.get('k8s_cluster_context', None)
 )
 
+javaOptsIvy = '-Divy.cache.dir=/tmp -Divy.home=/tmp'
 spark_default_conf = {
     'spark.sql.shuffle.partitions': '1000',
     'spark.sql.extensions': 'io.delta.sql.DeltaSparkSessionExtension',
@@ -73,7 +74,7 @@ spark_default_conf = {
     'spark.sql.warehouse.dir': f's3a://{datalake_bucket}/hive',
     'spark.eventLog.enabled': 'true',
     'spark.eventLog.dir': f's3a://{datalake_bucket}/spark-logs',
-    'spark.driver.extraJavaOptions': '"-Divy.cache.dir=/tmp -Divy.home=/tmp"',
+    'spark.driver.extraJavaOptions': javaOptsIvy,
     'spark.jars.ivy': '/tmp'
 }
 
@@ -115,13 +116,17 @@ spark_large_conf = {
     'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.path': '/data',
     'spark.kubernetes.executor.volumes.emptyDir.spark-local-dir-1.mount.readOnly': 'false',
 }
+
+javaOptsEsCert = (f'{javaOptsIvy} -Djavax.net.ssl.trustStore=/opt/keystores/truststore.p12 '
+                  f'-Djavax.net.ssl.trustStorePassword=changeit')
+
 spark_index_conf = {
     'spark.kubernetes.driver.podTemplateFile': 'local:///app/pod-template-es-cert.yml',
-    'spark.driver.extraJavaOptions': '-Divy.cache.dir=/tmp -Divy.home=/tmp -Djavax.net.ssl.trustStore=/opt/keystores/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit',
+    'spark.driver.extraJavaOptions': javaOptsEsCert,
     'spark.kubernetes.driver.secretKeyRef.ES_USERNAME': f'{es_credentials_secret_name}:{es_credentials_secret_key_username}',
     'spark.kubernetes.driver.secretKeyRef.ES_PASSWORD': f'{es_credentials_secret_name}:{es_credentials_secret_key_password}',
     'spark.kubernetes.executor.podTemplateFile': 'local:///app/pod-template-es-cert.yml',
-    'spark.executor.extraJavaOptions': '-Divy.cache.dir=/tmp -Divy.home=/tmp -Djavax.net.ssl.trustStore=/opt/keystores/truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit',
+    'spark.executor.extraJavaOptions': javaOptsEsCert,
     'spark.kubernetes.executor.secretKeyRef.ES_USERNAME': f'{es_credentials_secret_name}:{es_credentials_secret_key_username}',
     'spark.kubernetes.executor.secretKeyRef.ES_PASSWORD': f'{es_credentials_secret_name}:{es_credentials_secret_key_password}'
 }
@@ -136,19 +141,17 @@ etl_base_config = SparkOperatorConfig(
     spark_configs=[spark_default_conf],
     image=Variable.get('etl_image'),
     kube_config=kube_config
-)
+).add_packages('org.apache.hadoop:hadoop-aws:3.3.4', 'io.delta:delta-core_2.12:2.4.0')
 
-etl_deps_config = etl_base_config.add_packages('org.apache.hadoop:hadoop-aws:3.3.4','io.delta:delta-core_2.12:2.4.0')
-
-etl_index_config = etl_deps_config \
+etl_index_config = etl_base_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(index_jar)
 
-etl_publish_config = etl_deps_config \
+etl_publish_config = etl_base_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(publish_jar) \
     .with_spark_class('bio.ferlab.fhir.etl.PublishTask')
 
-etl_variant_config = etl_deps_config \
+etl_variant_config = etl_base_config \
     .add_spark_conf(spark_large_conf) \
     .with_spark_jar(variant_jar)

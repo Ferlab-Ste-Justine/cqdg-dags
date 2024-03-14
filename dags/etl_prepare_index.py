@@ -1,9 +1,9 @@
 from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
-from lib.config import default_config_file, etl_deps_config, spark_small_conf, prepare_index_jar, study_ids
+from lib.config import default_config_file, etl_base_config, spark_small_conf, prepare_index_jar, study_ids
 
-etl_prepare_config = etl_deps_config \
+etl_prepare_config = etl_base_config \
     .add_spark_conf(spark_small_conf) \
     .with_spark_jar(prepare_index_jar) \
     .with_spark_class('bio.ferlab.fhir.etl.PrepareIndex') \

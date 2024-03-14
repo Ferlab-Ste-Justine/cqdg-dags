@@ -13,7 +13,7 @@ from dataclasses import dataclass, field, asdict
 
 class SparkOperator(BaseKubernetesOperator):
     template_fields = [*BaseKubernetesOperator.template_fields, 'spark_jar', 'spark_class', 'spark_configs',
-                       'spark_packages']
+                       'spark_packages', 'spark_exclude_packages']
 
     def __init__(
             self,
@@ -22,6 +22,7 @@ class SparkOperator(BaseKubernetesOperator):
             spark_configs: List[dict] = [],
             spark_config_volume: Optional[str] = None,
             spark_packages: List[str] = [],
+            spark_exclude_packages: List[str] = [],
             is_skip: bool = False,
             is_skip_fail: bool = False,
 
@@ -35,6 +36,7 @@ class SparkOperator(BaseKubernetesOperator):
         self.spark_configs = spark_configs
         self.spark_config_volume = spark_config_volume
         self.spark_packages = spark_packages
+        self.spark_exclude_packages = spark_exclude_packages
         self.is_skip = is_skip
         self.is_skip_fail = is_skip_fail
 
@@ -90,10 +92,13 @@ class SparkOperator(BaseKubernetesOperator):
         # Build --packages attribute
         spark_packages_attributes = ['--packages', ','.join(self.spark_packages)] if self.spark_packages else []
 
+        # Build --exclude-packages attribute
+        spark_exclude_packages_attributes = ['--exclude-packages', ','.join(self.spark_exclude_packages)] if self.spark_exclude_packages else []
+
         # CMD
         self.cmds = ['/opt/spark/bin/spark-submit']
 
-        self.arguments = [*spark_packages_attributes, *driver_pod_name_config, *merged_config_attributes, '--class',
+        self.arguments = [*spark_packages_attributes, *spark_exclude_packages_attributes, *driver_pod_name_config, *merged_config_attributes, '--class',
                           self.spark_class, self.spark_jar, *self.arguments]
 
         # Mount additional config volume
@@ -158,11 +163,22 @@ class SparkOperator(BaseKubernetesOperator):
 
 @dataclass
 class SparkOperatorConfig(BaseConfig):
+    """"
+    Configuration for SparkOperator
+    :param spark_class: The main class of the Spark application
+    :param spark_jar: The location of the Spark jar file
+    :param spark_configs: List of Spark configuration
+    :param spark_config_volume: Name of the ConfigMap to mount as volume
+    :param spark_packages: List of Spark packages to install
+    :param is_skip: Skip the operator if True
+    :param is_skip_fail: Skip the operator if True and fail the task if the Spark job fails
+    """
     spark_class: Optional[str] = None
     spark_jar: Optional[str] = None
     spark_configs: List[dict] = field(default_factory=list)
     spark_config_volume: Optional[str] = None
     spark_packages: List[str] = field(default_factory=list)
+    spark_exclude_packages: List[str] = field(default_factory=list)
     is_skip: bool = False
     is_skip_fail: bool = False
 
@@ -179,6 +195,16 @@ class SparkOperatorConfig(BaseConfig):
     def add_packages(self, *new_packages) -> Self:
         c = copy.copy(self)
         c.spark_packages = [*self.spark_packages, *new_packages]
+        return c
+
+    def add_exclude_package(self, exclude_package: str) -> Self:
+        c = copy.copy(self)
+        c.exclude_packages = [*self.spark_exclude_packages, exclude_package]
+        return c
+
+    def add_exclude_packages(self, *exclude_packages) -> Self:
+        c = copy.copy(self)
+        c.exclude_packages = [*self.spark_exclude_packages, *exclude_packages]
         return c
 
     def skip(self) -> Self:

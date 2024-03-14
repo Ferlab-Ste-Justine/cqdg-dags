@@ -1,11 +1,11 @@
 from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
-from lib.config import etl_deps_config, spark_small_conf, import_jar, default_config_file, release_id, study_ids
+from lib.config import etl_base_config, spark_small_conf, import_jar, default_config_file, release_id, study_ids
 from lib.operators.spark import SparkOperator
 
 def etl_import():
-    return etl_deps_config \
+    return etl_base_config \
         .with_spark_class('bio.ferlab.fhir.etl.ImportTask') \
         .with_spark_jar(import_jar) \
          .add_spark_conf(spark_small_conf) \
