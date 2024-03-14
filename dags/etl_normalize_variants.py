@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.models import Param
 
 from lib.config import release_id, batch, default_config_file, study_id, spark_large_conf, \
-    etl_variant_config
+    etl_variant_config, spark_small_conf
 
 normalized_etl = etl_variant_config \
     .with_spark_class('bio.ferlab.etl.normalized.RunNormalizedGenomic') \
@@ -23,7 +23,7 @@ normalized_etl = etl_variant_config \
                                             'io.netty:netty-all,'
                                             'io.netty:netty-handler,'
                                             'io.netty:netty-transport-native-epoll'},
-                    spark_large_conf)
+                    spark_small_conf) \
 
 
 def normalize_variant_operator(name):
