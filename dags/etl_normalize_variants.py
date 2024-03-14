@@ -22,7 +22,8 @@ normalized_etl = etl_variant_config \
     .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client,'
                                             'io.netty:netty-all,'
                                             'io.netty:netty-handler,'
-                                            'io.netty:netty-transport-native-epoll'},
+                                            'io.netty:netty-transport-native-epoll',
+                     'spark.hadoop.io.compression.codecs':'io.projectglow.sql.util.BGZFCodec'},
                     spark_small_conf) \
 
 
