@@ -23,7 +23,9 @@ normalized_etl = etl_variant_config \
                                             'io.netty:netty-all,'
                                             'io.netty:netty-handler,'
                                             'io.netty:netty-transport-native-epoll',
-                     'spark.hadoop.io.compression.codecs':'io.projectglow.sql.util.BGZFCodec'},
+                     'spark.hadoop.io.compression.codecs':'io.projectglow.sql.util.BGZFCodec',
+                     'spark.log.level': 'DEBUG',
+                     },
                     spark_small_conf) \
 
 
