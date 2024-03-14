@@ -3,9 +3,10 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param
 
-from lib.config import release_id, batch, default_config_file, study_id, etl_base_config, spark_large_conf
+from lib.config import release_id, batch, default_config_file, study_id, spark_large_conf, \
+    etl_variant_config
 
-normalized_etl = etl_base_config \
+normalized_etl = etl_variant_config \
     .with_spark_class('bio.ferlab.etl.normalized.RunNormalizedGenomic') \
     .args(
         '--config', default_config_file,
@@ -17,7 +18,6 @@ normalized_etl = etl_base_config \
         '--study-id', study_id,
         '--study-code', '{{ params.study_code }}'
     ) \
-    .with_spark_jar('local:///app/variant-normalize-task.jar') \
     .add_package('io.projectglow:glow-spark3_2.12:2.0.0') \
     .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client'}, spark_large_conf)
 
