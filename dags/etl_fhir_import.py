@@ -3,8 +3,9 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param, Variable
 
+from ferload_drs_import import ferload_drs_import
 from lib.config import fhir_url, keycloak_client_secret_name, keycloak_url, aws_secret_name, aws_secret_access_key, \
-    aws_secret_secret_key, clinical_data_bucket, file_import_bucket, kube_config, aws_endpoint
+    aws_secret_secret_key, clinical_data_bucket, file_import_bucket, kube_config, aws_endpoint, study_code
 from lib.operators.fhir_import import FhirCsvOperator, FhirCsvConfig
 
 fhir_import_config = FhirCsvConfig(
@@ -22,6 +23,18 @@ fhir_import_config = FhirCsvConfig(
     image=Variable.get('fhir_import_image')
 ).args("bio/ferlab/cqdg/etl/FhirImport")
 
+def fhir_import():
+    csv_import = (fhir_import_config
+    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, project(), "true", is_restricted())
+    .operator(
+        task_id='fhir_import',
+        name='etl-fhir_import',
+    ))
+
+    csv_import >> ferload_drs_import()
+
+
+
 with DAG(
         dag_id='etl-fhir-import',
         start_date=datetime(2022, 1, 1),
@@ -30,9 +43,9 @@ with DAG(
             'prefix': Param('prefix', type='string'),
             'studyId': Param('7', type='string'),
             'studyVersion': Param('13', type='string'),
-            'study': Param('cag', type='string'),
+            'study_code': Param('cag', type='string'),
             'project': Param('jmichaud', type='string'),
-            'is_restricted': Param('', enum=['', 'true', 'false']),
+            'is_restricted': Param('false', enum=['true', 'false']),
         },
 ) as dag:
     def prefix() -> str:
@@ -47,10 +60,6 @@ with DAG(
         return '{{ params.studyVersion }}'
 
 
-    def study() -> str:
-        return '{{ params.study }}'
-
-
     def project() -> str:
         return '{{ params.project }}'
 
@@ -58,10 +67,4 @@ with DAG(
     def is_restricted() -> str:
         return '{{ params.is_restricted }}'
 
-
-    csv_import = fhir_import_config \
-        .args(prefix(), study_clin_data_id(), study_clin_data_version(), study(), project(), "true", is_restricted()) \
-        .operator(
-        task_id='fhir_import',
-        name='etl-fhir_import',
-    )
+    fhir_import()

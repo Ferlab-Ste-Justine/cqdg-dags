@@ -29,18 +29,20 @@ clinical_data_bucket = Variable.get('clinical_data_bucket')
 file_import_bucket = Variable.get('file_import_bucket')
 
 keycloak_client_secret_name = 'keycloak-client-system-credentials'
+keycloak_client_resource_secret_name = 'keycloak-client-resource-server-credentials'
 
 es_credentials_secret_name = 'opensearch-dags-credentials'
 es_credentials_secret_key_username = 'username'
 es_credentials_secret_key_password = 'password'
 
 default_params = {
-    'study_id': Param('ST0000017', type='string'),
+    'study_id': Param('CAG', type='string'),
     'project': Param('cqdg', type='string'),
 }
 
 study_id = '{{ params.study_id }}'
 study_ids = '{{ params.study_ids }}'
+study_code = '{{ params.study_code }}'
 project = '{{ params.project }}'
 dataset = '{{ params.dataset }}'
 batch = '{{ params.batch }}'

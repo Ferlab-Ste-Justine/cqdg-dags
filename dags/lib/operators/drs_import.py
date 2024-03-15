@@ -36,32 +36,32 @@ class DrsImportOperator(BaseKubernetesOperator):
 
     def execute(self, **kwargs):
 
-        if self.config.aws_endpoint:
+        if self.aws_endpoint:
             self.env_vars.append(
                 k8s.V1EnvVar(
                     name='AWS_ENDPOINT',
-                    value=self.config.aws_endpoint,
+                    value=self.aws_endpoint,
                 )
             )
-        if self.config.aws_credentials_secret_name:
+        if self.aws_credentials_secret_name:
             self.env_vars.append(
                 k8s.V1EnvVar(
-                    name='AWS_ACCESS_KEY_ID',
+                    name='AWS_ACCESS_KEY',
                     value_from=k8s.V1EnvVarSource(
                         secret_key_ref=k8s.V1SecretKeySelector(
-                            name=self.config.aws_credentials_secret_name,
-                            key=self.config.aws_credentials_secret_access_key,
+                            name=self.aws_credentials_secret_name,
+                            key=self.aws_credentials_secret_access_key,
                         ),
                     ),
                 ),
             )
             self.env_vars.append(
                 k8s.V1EnvVar(
-                    name='AWS_SECRET_ACCESS_KEY',
+                    name='AWS_SECRET_KEY',
                     value_from=k8s.V1EnvVarSource(
                         secret_key_ref=k8s.V1SecretKeySelector(
-                            name=self.config.aws_credentials_secret_name,
-                            key=self.config.aws_credentials_secret_secret_key,
+                            name=self.aws_credentials_secret_name,
+                            key=self.aws_credentials_secret_secret_key,
                         ),
                     ),
                 )
@@ -70,28 +70,28 @@ class DrsImportOperator(BaseKubernetesOperator):
             *self.env_vars,
             k8s.V1EnvVar(
                 name='S3_CLINICAL_DATA_BUCKET_NAME',
-                value=self.config.clinical_data_bucket_name,
+                value=self.clinical_data_bucket_name,
             ),
             k8s.V1EnvVar(
                 name='FHIR_URL',
-                value=self.config.fhir_url,
+                value=self.fhir_url,
             ),
             k8s.V1EnvVar(
                 name='FERLOAD_URL',
-                value=self.config.ferload_url,
+                value=self.ferload_url,
             ),
             k8s.V1EnvVar(
-                name='KEYCLOAK_RESOURCE_CLIENT_SECRET',
+                name='KEYCLOAK_CLIENT_SECRET',
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
-                        name=self.config.keycloak_client_secret_name,
-                        key=self.config.keycloak_client_secret_key,
+                        name=self.keycloak_client_secret_name,
+                        key=self.keycloak_client_secret_key,
                     ),
                 ),
             ),
             k8s.V1EnvVar(
                 name='KEYCLOAK_URL',
-                value=self.config.keycloak_url,
+                value=self.keycloak_url,
             ),
         ]
         self.cmds = ['java', '-cp', 'cqdg-ferload-drs-import.jar']
