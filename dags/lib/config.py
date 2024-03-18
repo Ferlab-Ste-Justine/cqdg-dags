@@ -75,7 +75,8 @@ spark_default_conf = {
     'spark.eventLog.enabled': 'true',
     'spark.eventLog.dir': f's3a://{datalake_bucket}/spark-logs',
     'spark.driver.extraJavaOptions': javaOptsIvy,
-    'spark.jars.ivy': '/tmp'
+    'spark.jars.ivy': '/tmp',
+    'spark.log.level': 'WARN'
 }
 
 spark_small_conf = {
