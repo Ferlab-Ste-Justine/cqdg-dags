@@ -43,6 +43,7 @@ default_params = {
 study_id = '{{ params.study_id }}'
 study_ids = '{{ params.study_ids }}'
 study_code = '{{ params.study_code }}'
+study_codes = '{{ params.study_codes }}'
 project = '{{ params.project }}'
 dataset = '{{ params.dataset }}'
 batch = '{{ params.batch }}'

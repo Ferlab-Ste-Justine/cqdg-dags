@@ -70,7 +70,7 @@ class BaseConfig:
     :param image: Optional[str]
     """
     kube_config: KubeConfig
-    is_delete_operator_pod: bool = False
+    is_delete_operator_pod: bool = True
     image: Optional[str] = None
     arguments: List[str] = field(default_factory=list)
 

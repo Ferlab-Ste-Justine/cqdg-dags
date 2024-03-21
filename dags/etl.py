@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.models.param import Param
 from airflow.utils.task_group import TaskGroup
 from datetime import datetime
-from lib.config import env, study_ids, release_id, es_port, es_url, etl_publish_config, project
+from lib.config import env, study_codes, release_id, es_port, es_url, etl_publish_config, project
 from es_templates_update import es_templates_update
 from etl_import import etl_import
 from arranger import arranger_task
@@ -16,7 +16,7 @@ with DAG(
         schedule_interval=None,
         params={
             'release_id': Param('7', type='string'),
-            'study_ids': Param('ST0000017', type='string'),
+            'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
             'es_port': Param('9200', type='string')
         },
@@ -28,7 +28,7 @@ with DAG(
     with TaskGroup(group_id='publish') as publish:
        def publish_operator(name:str):
             return etl_publish_config \
-                        .args(es_url, es_port, env, project, release_id, study_ids, f'{name}_centric') \
+                        .args(es_url, es_port, env, project, release_id, study_codes, f'{name}_centric') \
                         .operator(
                             task_id=f'{name}_centric',
                             name=f'etl-publish-{name}-centric'

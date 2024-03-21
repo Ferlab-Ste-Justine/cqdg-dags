@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
-from lib.config import default_config_file, study_ids
+from lib.config import default_config_file, study_codes
 from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
 
 with DAG(
@@ -9,7 +9,7 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_ids': Param('ST0000042', type='string'),
+            'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
@@ -22,7 +22,7 @@ with DAG(
             '--config', default_config_file,
             '--steps', 'default',
             '--app-name', 'enrich_specimen',
-            '--study-id', study_ids
+            '--study-id', study_codes
         ).operator(
             task_id='enrich-specimen',
             name='etl-enrich-specimen'

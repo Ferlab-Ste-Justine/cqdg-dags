@@ -10,7 +10,7 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_id': Param('ST0000002', type='string'),
+            'study_id': Param('CAG', type='string'),
             'dataset': Param('dataset_default', type='string'),
             'batch': Param('annotated_vcf', type='string'),
             'project': Param('cqdg', type='string'),
