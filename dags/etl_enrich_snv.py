@@ -3,14 +3,14 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from lib.config import default_config_file, etl_base_config, spark_medium_conf, variant_jar, study_id, dataset, batch
+from lib.config import default_config_file, etl_base_config, spark_medium_conf, variant_jar, study_code, dataset, batch
 
 with DAG(
         dag_id='etl-enrich-snv',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_id': Param('ST0000002', type='string'),
+            'study_code': Param('CAG', type='string'),
             'dataset': Param('dataset_default', type='string'),
             'batch': Param('annotated_vcf', type='string'),
             'project': Param('cqdg', type='string'),
@@ -25,7 +25,7 @@ with DAG(
         '--config', default_config_file,
         '--steps', 'default',
         '--app-name', 'variant_task_enrich_snv',
-        '--study-id', study_id,
+        '--study-code', study_code,
         '--dataset', dataset,
         '--batch', batch
     ).operator(

@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param
 
-from lib.config import release_id, batch, default_config_file, study_id, spark_large_conf, \
+from lib.config import batch, default_config_file, study_code, spark_large_conf, \
     etl_variant_config, spark_small_conf
 
 normalized_etl = etl_variant_config \
@@ -15,8 +15,7 @@ normalized_etl = etl_variant_config \
         '--owner', '{{ params.owner }}',
         '--dataset', '{{ params.dataset }}',
         '--batch', batch,
-        '--study-id', study_id,
-        '--study-code', '{{ params.study_code }}'
+        '--study-code', study_code
     ) \
     .add_package('io.projectglow:glow-spark3_2.12:2.0.0') \
     .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client,'
@@ -29,7 +28,7 @@ normalized_etl = etl_variant_config \
 
 
 def normalize_variant_operator(name):
-    etl = normalized_etl.args('--release-id', release_id) if name == 'snv' else normalized_etl
+    etl = normalized_etl if name == 'snv' else normalized_etl
     return etl.prepend_args(name).operator(
         task_id=f'normalize-{name}',
         name=f'normalize-{name}')
@@ -40,10 +39,8 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_id': Param('ST0000002', type='string'),
-            'study_code': Param('study1', type='string'),
+            'study_code': Param('CAG', type='string'),
             'owner': Param('jmichaud', type='string'),
-            'release_id': Param('1', type='string'),
             'dataset': Param('dataset_default', type='string'),
             'batch': Param('annotated_vcf', type='string'),
             'project': Param('cqdg', type='string'),

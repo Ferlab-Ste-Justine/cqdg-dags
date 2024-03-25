@@ -5,12 +5,6 @@ from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig, re
 
 
 class ArrangerOperator(BaseKubernetesOperator):
-    template_fields = [*BaseKubernetesOperator.template_fields, 'node_environment', 'es_url', 'spark_class',
-                       'es_port', 'es_cert_secret_name', 'es_credentials_secret_name',
-                       'es_credentials_secret_key_username', 'es_credentials_secret_key_password',
-                       'keycloak_client_secret_name', 'keycloak_client_secret_key'
-                       ]
-
     def __init__(
             self,
             node_environment: str,
