@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param
 
-from lib.config import batch, default_config_file, study_id, spark_large_conf, \
+from lib.config import batch, default_config_file, study_code, spark_large_conf, \
     etl_variant_config, spark_small_conf
 
 normalized_etl = etl_variant_config \
@@ -15,7 +15,7 @@ normalized_etl = etl_variant_config \
         '--owner', '{{ params.owner }}',
         '--dataset', '{{ params.dataset }}',
         '--batch', batch,
-        '--study-id', study_id
+        '--study-code', study_code
     ) \
     .add_package('io.projectglow:glow-spark3_2.12:2.0.0') \
     .add_spark_conf({'spark.jars.excludes': 'org.apache.hadoop:hadoop-client,'
@@ -39,7 +39,7 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_id': Param('CAG', type='string'),
+            'study_code': Param('CAG', type='string'),
             'owner': Param('jmichaud', type='string'),
             'dataset': Param('dataset_default', type='string'),
             'batch': Param('annotated_vcf', type='string'),

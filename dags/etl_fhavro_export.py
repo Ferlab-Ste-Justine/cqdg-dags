@@ -15,7 +15,8 @@ fhavro_config = FhavroConfig(
     aws_credentials_secret_access_key=aws_secret_access_key,
     aws_credentials_secret_secret_key=aws_secret_secret_key,
     kube_config=kube_config,
-    image=Variable.get('fhavro_export_image') 
+    image=Variable.get('fhavro_export_image'),
+    is_delete_operator_pod=True
 )
 
 def fhavro_export():
