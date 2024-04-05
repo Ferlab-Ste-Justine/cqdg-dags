@@ -2,12 +2,13 @@ from airflow import DAG
 from airflow.models.param import Param
 from airflow.utils.task_group import TaskGroup
 from datetime import datetime
-from lib import config
-from lib.operators.fhavro import FhavroOperator
-from lib.config import env, K8sContext
-from lib.operators.spark import SparkOperator
-from lib.operators.arranger import ArrangerOperator
+from lib.config import env, study_codes, release_id, es_port, es_url, etl_publish_config, project
 from es_templates_update import es_templates_update
+from etl_import import etl_import
+from arranger import arranger_task
+from etl_fhavro_export import fhavro_export
+from etl_index import index_operator
+from etl_prepare_index import prepare_index
 
 with DAG(
         dag_id='etl',
@@ -15,153 +16,24 @@ with DAG(
         schedule_interval=None,
         params={
             'release_id': Param('7', type='string'),
-            'study_ids': Param('ST0000017', type='string'),
+            'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
             'es_port': Param('9200', type='string')
         },
 ) as dag:
-    def release_id() -> str:
-        return '{{ params.release_id }}'
-
-
-    def study_ids() -> str:
-        return '{{ params.study_ids }}'
-
-
-    def project() -> str:
-        return '{{ params.project }}'
-
-
-    def es_port() -> str:
-        return '{{ params.es_port }}'
-
-
-    fhavro_export = FhavroOperator(
-        task_id='fhavro_export',
-        name='etl-fhavro_export',
-        k8s_context=K8sContext.DEFAULT,
-        cmds=['java',
-              '-cp',
-              'fhavro-export.jar',
-              'bio/ferlab/fhir/etl/FhavroExport',
-              release_id(), study_ids(), env
-              ],
-    )
-
-    import_task = SparkOperator(
-        task_id='import_task',
-        name='etl-import-task',
-        k8s_context=K8sContext.DEFAULT,
-        spark_jar=config.spark_import_jar,
-        spark_class='bio.ferlab.fhir.etl.ImportTask',
-        spark_config='etl-task-small',
-        arguments=[f'config/{env}-{project()}.conf', 'default', release_id(), study_ids()],
-    )
-
-    prepare_index = SparkOperator(
-        task_id='prepare_index',
-        name='etl-prepare-index',
-        k8s_context=K8sContext.DEFAULT,
-        spark_jar=config.spark_prepare_index_jar,
-        spark_class='bio.ferlab.fhir.etl.PrepareIndex',
-        spark_config='etl-task-small',
-        arguments=[f'config/{env}-{project()}.conf', 'default', 'all', study_ids()],
-    )
 
     with TaskGroup(group_id='index') as index:
-        study_centric = SparkOperator(
-            task_id='study_centric',
-            name='etl-index-study-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-task-small',
-            arguments=[release_id(), study_ids(), 'study_centric', env, project(), config.es_url, es_port()],
-        )
-
-        participant_centric = SparkOperator(
-            task_id='participant_centric',
-            name='etl-index-participant-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-task-small',
-            arguments=[release_id(), study_ids(), 'participant_centric', env, project(), config.es_url, es_port()],
-        )
-
-        file_centric = SparkOperator(
-            task_id='file_centric',
-            name='etl-index-file-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-task-small',
-            arguments=[release_id(), study_ids(), 'file_centric', env, project(), config.es_url, es_port()],
-        )
-
-        biospecimen_centric = SparkOperator(
-            task_id='biospecimen_centric',
-            name='etl-index-biospecimen-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_index_jar,
-            spark_class='bio.ferlab.fhir.etl.IndexTask',
-            spark_config='etl-task-small',
-            arguments=[release_id(), study_ids(), 'biospecimen_centric', env, project(), config.es_url, es_port()],
-        )
-        study_centric >> participant_centric >> file_centric >> biospecimen_centric
+        index_operator('study') >> index_operator('participant') >> index_operator('file') >> index_operator('biospecimen')
 
     with TaskGroup(group_id='publish') as publish:
-        study_centric = SparkOperator(
-            task_id='study_centric',
-            name='etl-publish-study-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_publish_jar,
-            spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-task-small',
-            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'study_centric'],
-        )
-
-        participant_centric = SparkOperator(
-            task_id='participant_centric',
-            name='etl-publish-participant-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_publish_jar,
-            spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-task-small',
-            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'participant_centric'],
-        )
-
-        file_centric = SparkOperator(
-            task_id='file_centric',
-            name='etl-publish-file-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_publish_jar,
-            spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-task-small',
-            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'file_centric'],
-        )
-
-        biospecimen_centric = SparkOperator(
-            task_id='biospecimen_centric',
-            name='etl-publish-biospecimen-centric',
-            k8s_context=K8sContext.DEFAULT,
-            spark_jar=config.spark_publish_jar,
-            spark_class='bio.ferlab.fhir.etl.PublishTask',
-            spark_config='etl-task-small',
-            arguments=[config.es_url, es_port(), env, project(), release_id(), study_ids(), 'biospecimen_centric'],
-        )
-
-        study_centric >> participant_centric >> file_centric >> biospecimen_centric
-
-    arranger_update_project = ArrangerOperator(
-        task_id='arranger_update_project',
-        name='etl-publish-arranger-update-project',
-        k8s_context=K8sContext.DEFAULT,
-        cmds=['node',
-              '--experimental-modules=node',
-              '--es-module-specifier-resolution=node',
-              'admin/run.mjs'
-              ],
-    )
-
-    fhavro_export >> import_task >> prepare_index >> es_templates_update >> index >> publish >> arranger_update_project
+       def publish_operator(name:str):
+            return etl_publish_config \
+                        .args(es_url, es_port, env, project, release_id, study_codes, f'{name}_centric') \
+                        .operator(
+                            task_id=f'{name}_centric',
+                            name=f'etl-publish-{name}-centric'
+                        )            
+              
+       publish_operator('study') >> publish_operator('participant') >> publish_operator('file') >>  publish_operator('biospecimen') 
+    
+    fhavro_export() >> etl_import() >> prepare_index() >> es_templates_update() >> index >> publish >> arranger_task()

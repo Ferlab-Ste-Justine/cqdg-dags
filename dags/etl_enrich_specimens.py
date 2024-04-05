@@ -1,37 +1,31 @@
 from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
-from lib import config
-from lib.config import env, Env, K8sContext
-from lib.operators.spark import SparkOperator
+from lib.config import default_config_file, study_codes
+from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
 
 with DAG(
-        dag_id='etl_enrich_specimen',
+        dag_id='etl-enrich-specimen',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_ids': Param('ST0000042', type='string'),
+            'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
 
-    def study_ids() -> str:
-        return '{{ params.study_ids }}'
-
-    def project() -> str:
-        return '{{ params.project }}'
-
-
-    enrich_specimen = SparkOperator(
-        task_id='enrich-specimen',
-        name='etl-enrich-specimen',
-        k8s_context=K8sContext.DEFAULT,
-        spark_jar=config.spark_prepare_index_jar,
-        spark_class='bio.ferlab.fhir.etl.Enrich',
-        spark_config='etl-task-small',
-        arguments=['--config', f'config/{env}-{project()}.conf',
-                   '--steps', 'default',
-                   '--app-name', 'enrich_specimen',
-                   '--study-id', study_ids()],
-    )
+    etl_base_config \
+        .add_spark_conf(spark_small_conf) \
+        .with_spark_jar(prepare_index_jar) \
+        .with_spark_class('bio.ferlab.fhir.etl.Enrich') \
+        .args(
+            '--config', default_config_file,
+            '--steps', 'default',
+            '--app-name', 'enrich_specimen',
+            '--study-id', study_codes
+        ).operator(
+            task_id='enrich-specimen',
+            name='etl-enrich-specimen'
+        )
+    
 

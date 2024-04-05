@@ -1,87 +1,92 @@
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
-from lib import config
-from lib.config import env
-import time
-
-from dags.lib.config import Env
+from typing import Optional, Type
+from dataclasses import dataclass
+from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig, required
 
 
-class ArrangerOperator(KubernetesPodOperator):
-
+class ArrangerOperator(BaseKubernetesOperator):
     def __init__(
-        self,
-        k8s_context: str,
-        **kwargs,
+            self,
+            node_environment: str,
+            es_url: str,
+            es_port: Optional[str] = '9200',
+            es_cert_secret_name: Optional[str] = None,
+            es_cert_file: Optional[str] = 'ca.crt',
+            es_credentials_secret_name: Optional[str] = None,
+            es_credentials_secret_key_username: Optional[str] = 'username',
+            es_credentials_secret_key_password: Optional[str] = 'password',
+            keycloak_client_secret_name: Optional[str] = None,
+            keycloak_client_secret_key: Optional[str] = 'client-secret',
+            **kwargs,
     ) -> None:
         super().__init__(
-            is_delete_operator_pod=True,
-            in_cluster=config.k8s_in_cluster(k8s_context),
-            cluster_context=config.k8s_cluster_context(k8s_context),
-            namespace=config.k8s_namespace,
-            image=config.arranger_image,
-            **kwargs,
+            **kwargs
         )
+        self.node_environment = node_environment
+        self.es_url = es_url
+        self.es_port = es_port
+        self.es_cert_secret_name = es_cert_secret_name
+        self.es_cert_file = es_cert_file
+        self.es_credentials_secret_name = es_credentials_secret_name
+        self.es_credentials_secret_key_username = es_credentials_secret_key_username
+        self.es_credentials_secret_key_password = es_credentials_secret_key_password
+        self.keycloak_client_secret_name = keycloak_client_secret_name
+        self.keycloak_client_secret_key = keycloak_client_secret_key
 
     def execute(self, **kwargs):
-        self.image_pull_secrets = [
-            k8s.V1LocalObjectReference(
-                name='images-registry-credentials',
-            ),
-        ]
-        self.env_vars = [
+
+        self.env_vars.append(
+            k8s.V1EnvVar(
+                name='NODE_ENV',
+                value=self.node_environment,
+            )
+        )
+        self.env_vars.append(
             k8s.V1EnvVar(
                 name='ES_HOST',
-                value="{0}:9200".format(config.es_url),
+                value=f"{self.es_url}:{self.es_port}",
             ),
-            k8s.V1EnvVar(
-                name='NODE_EXTRA_CA_CERTS',
-                value='/opt/opensearch-ca/ca.crt',
-            ),
-            k8s.V1EnvVar(
-                name='ES_USER',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='opensearch-dags-credentials',
-                        key='username',
-                    ),
-                ),
-            ),
-            k8s.V1EnvVar(
-                name='ES_PASS',
-                value_from=k8s.V1EnvVarSource(
-                    secret_key_ref=k8s.V1SecretKeySelector(
-                        name='opensearch-dags-credentials',
-                        key='password',
-                    ),
-                ),
-            ),
-        ]
+        )
 
-        self.volumes = []
-        self.volume_mounts = []
-
-        if env in [Env.PROD]:
+        if self.es_credentials_secret_name:
             self.env_vars.append(
                 k8s.V1EnvVar(
-                    name='NODE_ENV',
-                    value='production',
+                    name='ES_USER',
+                    value_from=k8s.V1EnvVarSource(
+                        secret_key_ref=k8s.V1SecretKeySelector(
+                            name=self.es_credentials_secret_name,
+                            key=self.es_credentials_secret_key_username)
+                    )
                 )
             )
+            self.env_vars.append(
+                k8s.V1EnvVar(
+                    name='ES_PASS',
+                    value_from=k8s.V1EnvVarSource(
+                        secret_key_ref=k8s.V1SecretKeySelector(
+                            name=self.es_credentials_secret_name,
+                            key=self.es_credentials_secret_key_password)
+                    )
+                )
+            )
+
+        if self.keycloak_client_secret_name:
             self.env_vars.append(
                 k8s.V1EnvVar(
                     name='KEYCLOAK_CLIENT_SECRET',
                     value_from=k8s.V1EnvVarSource(
                         secret_key_ref=k8s.V1SecretKeySelector(
-                            name='keycloak-client-system-credentials',
-                            key='client-secret',
+                            name=self.keycloak_client_secret_name,
+                            key=self.keycloak_client_secret_key,
                         ),
                     ),
                 )
             )
+
+        if self.es_cert_secret_name:
             self.volumes.append(
                 k8s.V1Volume(
-                    name='opensearch-ca-certificate',
+                    name=self.es_cert_secret_name,
                     secret=k8s.V1SecretVolumeSource(
                         secret_name='opensearch-ca-certificate',
                         default_mode=0o555
@@ -90,44 +95,35 @@ class ArrangerOperator(KubernetesPodOperator):
             )
             self.volume_mounts.append(
                 k8s.V1VolumeMount(
-                    name='opensearch-ca-certificate',
+                    name=self.es_cert_secret_name,
                     mount_path='/opt/opensearch-ca',
                     read_only=True,
                 ),
             )
-        else:
             self.env_vars.append(
                 k8s.V1EnvVar(
-                    name='NODE_ENV',
-                    value='qa',
+                    name='NODE_EXTRA_CA_CERTS',
+                    value=f'/opt/opensearch-ca/{self.es_cert_file}',
                 )
-            )
-            self.env_vars.append(
-                k8s.V1EnvVar(
-                    name='KEYCLOAK_CLIENT_SECRET',
-                    value_from=k8s.V1EnvVarSource(
-                        secret_key_ref=k8s.V1SecretKeySelector(
-                            name='keycloak-client-system-credentials',
-                            key='client-secret',
-                        ),
-                    ),
-                )
-            )
-            self.volumes.append(
-                k8s.V1Volume(
-                    name='opensearch-ca-certificate',
-                    secret=k8s.V1SecretVolumeSource(
-                        secret_name='opensearch-ca-certificate',
-                        default_mode=0o555
-                    ),
-                ),
-            )
-            self.volume_mounts.append(
-                k8s.V1VolumeMount(
-                    name='opensearch-ca-certificate',
-                    mount_path='/opt/opensearch-ca',
-                    read_only=True,
-                ),
             )
 
+        self.cmds = ['node']
         super().execute(**kwargs)
+
+
+@dataclass
+class ArrangerConfig(BaseConfig):
+    node_environment: str = required()  # we need a default value because BaseConfig has some default fields. See
+    # https://stackoverflow.com/questions/51575931/class-inheritance-in-python-3-7-dataclasses
+    es_url: Optional[str] = required()
+    es_port: Optional[str] = '9200'
+    es_cert_secret_name: Optional[str] = None
+    es_cert_file: Optional[str] = 'ca.crt'
+    es_credentials_secret_name: Optional[str] = None
+    es_credentials_secret_key_username: Optional[str] = 'username'
+    es_credentials_secret_key_password: Optional[str] = 'password'
+    keycloak_client_secret_name: Optional[str] = None
+    keycloak_client_secret_key: Optional[str] = 'client-secret'
+
+    def operator(self, class_to_instantiate: Type[ArrangerOperator] = ArrangerOperator, **kwargs) -> ArrangerOperator:
+        return super().build_operator(class_to_instantiate=class_to_instantiate, **kwargs)

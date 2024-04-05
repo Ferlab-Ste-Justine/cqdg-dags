@@ -1,8 +1,7 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 
-from lib import config
-from lib.config import env
+from lib.config import datalake_bucket, kube_config, aws_endpoint, aws_secret_name, aws_secret_access_key, aws_secret_secret_key
 
 script = f"""
     #!/bin/bash
@@ -33,46 +32,47 @@ script = f"""
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_suggestions.json --output ./templates/template_gene_suggestions.json
     
     echo Copy templates ...
-    mc cp ./templates/template_study_centric.json myminio/cqdg-{env}-app-datalake/templates/template_study_centric.json
-    mc cp ./templates/template_file_centric.json myminio/cqdg-{env}-app-datalake/templates/template_file_centric.json
-    mc cp ./templates/template_participant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_participant_centric.json
-    mc cp ./templates/template_biospecimen_centric.json myminio/cqdg-{env}-app-datalake/templates/template_biospecimen_centric.json 
+    mc cp ./templates/template_study_centric.json myminio/{datalake_bucket}/templates/template_study_centric.json
+    mc cp ./templates/template_file_centric.json myminio/{datalake_bucket}/templates/template_file_centric.json
+    mc cp ./templates/template_participant_centric.json myminio/{datalake_bucket}/templates/template_participant_centric.json
+    mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_biospecimen_centric.json 
         
-    mc cp ./templates/template_variant_centric.json myminio/cqdg-{env}-app-datalake/templates/template_variant_centric.json     
-    mc cp ./templates/template_gene_centric.json myminio/cqdg-{env}-app-datalake/templates/template_gene_centric.json     
-    mc cp ./templates/template_variant_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_variant_suggestions.json     
-    mc cp ./templates/template_gene_suggestions.json myminio/cqdg-{env}-app-datalake/templates/template_gene_suggestions.json     
+    mc cp ./templates/template_variant_centric.json myminio/{datalake_bucket}/templates/template_variant_centric.json     
+    mc cp ./templates/template_gene_centric.json myminio/{datalake_bucket}/templates/template_gene_centric.json     
+    mc cp ./templates/template_variant_suggestions.json myminio/{datalake_bucket}/templates/template_variant_suggestions.json     
+    mc cp ./templates/template_gene_suggestions.json myminio/{datalake_bucket}/templates/template_gene_suggestions.json     
 """
 
-es_templates_update = KubernetesPodOperator(
-    task_id='es_templates_update',
-    name='es-templates-update',
-    image="alpine:3.14",
-    is_delete_operator_pod=True,
-    cmds=["sh", "-cx"],
-    arguments=[script],
-    namespace=config.k8s_namespace,
-    env_vars=[
-        k8s.V1EnvVar(
-            name='AWS_ENDPOINT',
-            value='https://objets.juno.calculquebec.ca',
-        ),
-        k8s.V1EnvVar(
-            name='AWS_ACCESS_KEY_ID',
-            value_from=k8s.V1EnvVarSource(
-                secret_key_ref=k8s.V1SecretKeySelector(
-                    name='ceph-s3-credentials',
-                    key='access',
+def es_templates_update():
+    return KubernetesPodOperator(
+        task_id='es_templates_update',
+        name='es-templates-update',
+        image="alpine:3.14",
+        is_delete_operator_pod=True,
+        cmds=["sh", "-cx"],
+        arguments=[script],
+        namespace=kube_config.namespace,
+        env_vars=[
+            k8s.V1EnvVar(
+                name='AWS_ENDPOINT',
+                value=aws_endpoint,
+            ),
+            k8s.V1EnvVar(
+                name='AWS_ACCESS_KEY_ID',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name=aws_secret_name,
+                        key=aws_secret_access_key,
+                    ),
                 ),
             ),
-        ),
-        k8s.V1EnvVar(
-            name='AWS_SECRET_ACCESS_KEY',
-            value_from=k8s.V1EnvVarSource(
-                secret_key_ref=k8s.V1SecretKeySelector(
-                    name='ceph-s3-credentials',
-                    key='secret',
+            k8s.V1EnvVar(
+                name='AWS_SECRET_ACCESS_KEY',
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name=aws_secret_name,
+                        key=aws_secret_secret_key,
+                    ),
                 ),
-            ),
-        ), ]
-)
+            ), ]
+    )
