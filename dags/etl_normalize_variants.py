@@ -23,8 +23,7 @@ normalized_etl = etl_variant_config \
                                             'io.netty:netty-handler,'
                                             'io.netty:netty-transport-native-epoll',
                      'spark.hadoop.io.compression.codecs': 'io.projectglow.sql.util.BGZFCodec',
-                     },
-                    spark_small_conf) \
+                     }) \
 
 
 def normalize_variant_operator(name):
