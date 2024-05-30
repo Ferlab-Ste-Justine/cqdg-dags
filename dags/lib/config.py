@@ -140,6 +140,7 @@ prepare_index_jar = 'local:///app/prepare-index.jar'
 import_jar = 'local:///app/import-task.jar'
 index_jar = 'local:///app/index-task.jar'
 publish_jar = 'local:///app/publish-task.jar'
+obo_parser_jar = 'local:///app/obo-parser.jar'
 
 etl_base_config = SparkOperatorConfig(
     spark_configs=[spark_default_conf],
