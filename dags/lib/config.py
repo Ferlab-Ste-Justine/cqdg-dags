@@ -152,11 +152,6 @@ etl_index_config = etl_base_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(index_jar)
 
-etl_publish_config = etl_base_config \
-    .add_spark_conf(spark_small_conf, spark_index_conf) \
-    .with_spark_jar(publish_jar) \
-    .with_spark_class('bio.ferlab.fhir.etl.PublishTask')
-
 etl_variant_config = etl_base_config \
     .add_spark_conf(spark_large_conf) \
     .with_spark_jar(variant_jar)
