@@ -9,6 +9,13 @@ etl_variant_prepared_config = etl_variant_config \
     .args('--config', default_config_file,
           '--steps', 'default'
     )
+
+def etl_variant_prepared(name):
+    return etl_variant_prepared_config.prepend_args(name).operator(
+        task_id=f'variant_task_{name}',
+        name=f'etl-variant_task_{name}'
+    )
+
 with DAG(
         dag_id='etl-prepare-index-variant',
         start_date=datetime(2022, 1, 1),
@@ -18,24 +25,4 @@ with DAG(
         },
 ) as dag:
 
-    variant_task_variant_centric = etl_variant_prepared_config.prepend_args('variant_centric').operator(
-        task_id='variant_task_variant_centric',
-        name='etl-variant_task_variant_centric'
-    )
-
-    variant_task_gene_centric = etl_variant_prepared_config.prepend_args('gene_centric').operator(
-        task_id='variant_task_gene_centric',
-        name='etl-variant_task_gene_centric'
-    )
-
-    variant_task_variant_suggestions = etl_variant_prepared_config.prepend_args('variant_suggestions').operator(
-        task_id='variant_task_variant_suggestions',
-        name='etl-variant_variant_suggestions'
-    )
-
-    variant_task_gene_suggestions = etl_variant_prepared_config.prepend_args('gene_suggestions').operator(
-        task_id='variant_task_gene_suggestions',
-        name='etl-variant_gene_suggestions'
-    )
-
-    variant_task_variant_centric >> variant_task_gene_centric >> variant_task_variant_suggestions >> variant_task_gene_suggestions
+    etl_variant_prepared('variant_centric') >> etl_variant_prepared('gene_centric') >> etl_variant_prepared('variant_suggestions') >> etl_variant_prepared('gene_suggestions')
