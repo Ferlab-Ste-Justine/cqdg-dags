@@ -5,32 +5,50 @@ from airflow.models.param import Param
 from airflow.utils.task_group import TaskGroup
 
 from es_templates_update import es_templates_update
-from etl_enrich_specimens import  etl_enrich_specimens
+from etl_enrich_specimens import etl_enrich_specimens
 from etl_enrich_variants import variant_task_enrich_variants, variant_task_enrich_consequences
-from etl_index import index_operator
 from etl_index_variants import index_variants
-from etl_normalize_variants import normalize_variant_operator
+from etl_normalize_variants import extract_params, normalized_etl
 from etl_prepare_index_variants import etl_variant_prepared
-from etl_publish import publish_task
+from etl_publish_variants import publish_task
 
 with DAG(
         dag_id='etl-variant',
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
+        # concurrency set to 1, only one task can run at a time to avoid conflicts in Delta table
+        concurrency=1,
         params={
-            'study_code': Param('CAG', type='string'), #FIXME study Codes vs study code !!!
+            'study_code': Param('CAG', type='string'),
             'owner': Param('jmichaud', type='string'),
-            'dataset': Param('dataset_default', type='string'),
-            'batch': Param('annotated_vcf', type='string'),
+            'dateset_batches': Param(
+                [
+                    {'dataset': 'dataset_dataset1', 'batches': ['annotated_vcf1','annotated_vcf2']},
+                    {'dataset': 'dataset_dataset2', 'batches': ['annotated_vcf']}
+                ],
+                schema =  {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "default": {'dataset': 'dataset_default', 'batches': ['annotated_vcf']},
+                        "properties": {
+                            "dataset": {"type": "string"},
+                            "batches": {"type": "array", "items": {"type": "string"}},
+                        },
+                        "required": ["dataset", "batches"]
+                    },
+                }
+            ),
             'release_id': Param('7', type='string'),
-            'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
-            'es_port': Param('9200', type='string')
+            'es_port': Param('9200', type='string'),
         },
 ) as dag:
+    params = extract_params()
 
     with TaskGroup(group_id='normalize') as normalize:
-        normalize_variant_operator('snv') >> normalize_variant_operator('consequences')
+        normalized_etl(run_time_params = params, name='snv') >> normalized_etl(run_time_params = params, name='consequences')
 
     with TaskGroup(group_id='enrich') as enrich:
         variant_task_enrich_variants() >> variant_task_enrich_consequences()

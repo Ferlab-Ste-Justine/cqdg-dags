@@ -18,12 +18,12 @@ etl_publish_config = PublishConfig(
 
 def publish_task(job_types: str):
     return etl_publish_config.args(
-              es_url,
-              es_port,
-              release_id,
-              study_codes,
-              job_types) \
-              .operator(
+        '-n', 'https://search-workers.qa.juno.cqdg.ferlab.bio',
+        '-p', es_port,
+        '-r', release_id,
+        '-j', job_types,
+        '-s', study_codes) \
+        .operator(
                 task_id='etl_publish',
                 name='etl-publish',
               )

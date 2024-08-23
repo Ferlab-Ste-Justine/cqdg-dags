@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from airflow import DAG
 from airflow.models.param import Param
-from datetime import datetime
-from lib.config import default_config_file, study_code, study_codes
+
 from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
+from lib.config import default_config_file, study_code
+
 
 def etl_enrich_specimens():
     return etl_base_config \
@@ -13,7 +16,7 @@ def etl_enrich_specimens():
         '--config', default_config_file,
         '--steps', 'default',
         '--app-name', 'enrich_specimen',
-        '--study-id', study_code or study_codes
+        '--study-id', study_code,
     ).operator(
         task_id='enrich-specimen',
         name='etl-enrich-specimen'
