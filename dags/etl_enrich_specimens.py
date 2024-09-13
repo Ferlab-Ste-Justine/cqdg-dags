@@ -5,6 +5,7 @@ from airflow.models.param import Param
 
 from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
 from lib.config import default_config_file, study_code
+from lib.slack import Slack
 
 
 def etl_enrich_specimens():
@@ -19,7 +20,8 @@ def etl_enrich_specimens():
         '--study-id', study_code,
     ).operator(
         task_id='enrich-specimen',
-        name='etl-enrich-specimen'
+        name='etl-enrich-specimen',
+        on_failure_callback=Slack.notify_task_failure
     )
 
 with DAG(

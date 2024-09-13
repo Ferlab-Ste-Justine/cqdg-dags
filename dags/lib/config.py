@@ -17,6 +17,8 @@ es_port = Variable.get('es_port', '9200')
 keycloak_url = Variable.get('keycloak_url')
 fhir_url = Variable.get('fhir_url')
 
+slack_hook_url = Variable.get('slack_hook_url', None)
+
 aws_secret_name = 'ceph-s3-credentials'
 aws_secret_access_key = 'access'
 aws_secret_secret_key = 'secret'
@@ -49,6 +51,8 @@ dataset = '{{ params.dataset }}'
 batch = '{{ params.batch }}'
 release_id = '{{ params.release_id }}'
 default_config_file = f'config/{env}-{project}.conf'
+def color(prefix: str = '') -> str:
+    return '{% if params.color and params.color|length %}' + prefix + '{{ params.color }}{% endif %}'
 
 kube_config = KubeConfig(
     in_cluster=Variable.get('k8s_in_cluster', 'true').lower() == 'true',

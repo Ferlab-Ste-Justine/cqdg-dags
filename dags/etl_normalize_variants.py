@@ -9,6 +9,8 @@ from airflow.operators.python import get_current_context
 
 from lib.config import default_config_file, study_code, etl_variant_config
 from lib.operators.spark import SparkOperator
+from lib.slack import Slack
+
 
 class NormalizeVariants(SparkOperator):
     template_fields = [*SparkOperator.template_fields, 'arguments', 'dataset_batch']
@@ -97,6 +99,7 @@ with DAG(
                 }
             ),
         },
+        on_failure_callback=Slack.notify_task_failure
 ) as dag:
     params = extract_params()
 
