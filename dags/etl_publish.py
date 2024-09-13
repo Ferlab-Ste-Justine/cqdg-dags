@@ -4,6 +4,7 @@ from datetime import datetime
 from lib.config import kube_config, es_url, es_port, es_credentials_secret_name, \
     es_credentials_secret_key_password, es_credentials_secret_key_username, release_id, study_codes
 from lib.operators.publish import PublishConfig
+from lib.slack import Slack
 
 etl_publish_config = PublishConfig(
     es_url = es_url,
@@ -26,6 +27,7 @@ def publish_task(job_types: str):
         .operator(
                 task_id='etl_publish',
                 name='etl-publish',
+                on_failure_callback=Slack.notify_task_failure
               )
 with DAG(
         dag_id='etl-publish',

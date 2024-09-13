@@ -3,6 +3,7 @@ from airflow.models.param import Param
 from airflow.utils.task_group import TaskGroup
 from datetime import datetime
 from lib.config import es_port, es_url, release_id, default_config_file, etl_index_config, datalake_bucket, env, Env
+from lib.slack import Slack
 
 etl_index_variant_config = etl_index_config \
     .with_spark_class('bio.ferlab.fhir.etl.VariantIndexTask')
@@ -50,5 +51,6 @@ with DAG(
             'release_id': Param('7', type='string'),
             'project': Param('cqdg', type='string')
         },
+        on_failure_callback=Slack.notify_task_failure
 ) as dag:
     index_variants()

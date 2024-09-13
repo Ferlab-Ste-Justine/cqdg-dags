@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from airflow import DAG
 from airflow.models import Param, Variable
-from datetime import datetime
+
 from lib.config import kube_config, es_url, es_port, es_credentials_secret_name, \
-    es_credentials_secret_key_password, es_credentials_secret_key_username, release_id, study_codes
+    es_credentials_secret_key_password, es_credentials_secret_key_username, release_id
 from lib.operators.publish import PublishConfig
+from lib.slack import Slack
 
 etl_publish_config = PublishConfig(
     es_url = es_url,
@@ -35,6 +38,7 @@ with DAG(
             'release_id': Param('0', type='string'),
             'job_types': Param('variant_centric,variant_suggestions,gene_centric,gene_suggestions', type='string'),
         },
+        on_failure_callback=Slack.notify_task_failure
 ) as dag:
     publish_task('{{ params.job_types }}')
 

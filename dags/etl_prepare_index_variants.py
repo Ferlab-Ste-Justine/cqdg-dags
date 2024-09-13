@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from airflow import DAG
 from airflow.models.param import Param
-from datetime import datetime
+
 from lib.config import etl_variant_config, default_config_file
-from lib.operators.spark import SparkOperator
+from lib.slack import Slack
 
 etl_variant_prepared_config = etl_variant_config \
     .with_spark_class('bio.ferlab.etl.prepared.RunPrepared') \
@@ -23,6 +25,7 @@ with DAG(
         params={
             'project': Param('cqdg', type='string'),
         },
+        on_failure_callback=Slack.notify_task_failure
 ) as dag:
 
     etl_variant_prepared('variant_centric') >> etl_variant_prepared('gene_centric') >> etl_variant_prepared('variant_suggestions') >> etl_variant_prepared('gene_suggestions')

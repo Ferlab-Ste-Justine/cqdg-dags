@@ -2,6 +2,7 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.models.param import Param
+from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
 from es_templates_update import es_templates_update
@@ -11,6 +12,7 @@ from etl_index_variants import index_variants
 from etl_normalize_variants import extract_params, normalized_etl
 from etl_prepare_index_variants import etl_variant_prepared
 from etl_publish_variants import publish_task
+from lib.slack import Slack
 
 with DAG(
         dag_id='etl-variant',
@@ -59,4 +61,15 @@ with DAG(
     with TaskGroup(group_id='index') as index:
         index_variants()
 
-    etl_enrich_specimens() >> normalize >> enrich >> prepared >> es_templates_update() >> index >> publish_task('variant_centric,variant_suggestions,gene_centric,gene_suggestions')
+    start = EmptyOperator(
+        task_id="start",
+        on_success_callback=Slack.notify_dag_start
+    )
+
+    slack = EmptyOperator(
+        task_id="slack",
+        on_success_callback=Slack.notify_dag_completion
+    )
+
+
+start >> etl_enrich_specimens() >> normalize >> enrich >> prepared >> es_templates_update() >> index >> publish_task('variant_centric,variant_suggestions,gene_centric,gene_suggestions') >> slack
