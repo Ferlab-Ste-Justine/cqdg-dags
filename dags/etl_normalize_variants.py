@@ -4,8 +4,8 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.decorators import task
+from airflow.models import DagRun
 from airflow.models import Param
-from airflow.operators.python import get_current_context
 
 from lib.config import default_config_file, study_code, etl_variant_config
 from lib.operators.spark import SparkOperator
@@ -30,12 +30,12 @@ class NormalizeVariants(SparkOperator):
         super().execute(**kwargs)
 
 @task
-def extract_params() -> list[(str, list[str])]:
+def extract_params(ti=None) -> list[(str, list[str])]:
     """Extract input arguments at runtime.
     Returns: List of datasets with their batches
     """
-    context = get_current_context()
-    items = context["params"]["dateset_batches"]
+    dag_run: DagRun = ti.dag_run
+    items = dag_run.conf["dateset_batches"]
     r_list = []
 
     for item in items:
