@@ -2,6 +2,7 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 from kubernetes.client import models as k8s
 
 from lib.config import datalake_bucket, kube_config, aws_endpoint, aws_secret_name, aws_secret_access_key, aws_secret_secret_key
+from lib.slack import Slack
 
 script = f"""
     #!/bin/bash
@@ -74,5 +75,6 @@ def es_templates_update():
                         key=aws_secret_secret_key,
                     ),
                 ),
-            ), ]
+            ), ],
+        on_failure_callback=Slack.notify_task_failure
     )

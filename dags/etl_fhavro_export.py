@@ -4,6 +4,7 @@ from datetime import datetime
 from lib.config import env, fhir_url, datalake_bucket, keycloak_client_secret_name, keycloak_url, \
     aws_secret_name, aws_secret_access_key, aws_secret_secret_key, kube_config, aws_endpoint, study_codes
 from lib.operators.fhavro import FhavroConfig
+from lib.slack import Slack
 
 fhavro_config = FhavroConfig(
     fhir_url=fhir_url,
@@ -22,7 +23,8 @@ fhavro_config = FhavroConfig(
 def fhavro_export():
     return fhavro_config.args(study_codes, env).operator(
         task_id='fhavro_export',
-        name='etl-fhavro_export'
+        name='etl-fhavro_export',
+        on_failure_callback=Slack.notify_task_failure
     )
 
 with DAG(

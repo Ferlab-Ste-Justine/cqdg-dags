@@ -17,6 +17,8 @@ es_port = Variable.get('es_port', '9200')
 keycloak_url = Variable.get('keycloak_url')
 fhir_url = Variable.get('fhir_url')
 
+slack_hook_url = Variable.get('slack_hook_url', None)
+
 aws_secret_name = 'ceph-s3-credentials'
 aws_secret_access_key = 'access'
 aws_secret_secret_key = 'secret'
@@ -49,6 +51,8 @@ dataset = '{{ params.dataset }}'
 batch = '{{ params.batch }}'
 release_id = '{{ params.release_id }}'
 default_config_file = f'config/{env}-{project}.conf'
+def color(prefix: str = '') -> str:
+    return '{% if params.color and params.color|length %}' + prefix + '{{ params.color }}{% endif %}'
 
 kube_config = KubeConfig(
     in_cluster=Variable.get('k8s_in_cluster', 'true').lower() == 'true',
@@ -140,6 +144,7 @@ prepare_index_jar = 'local:///app/prepare-index.jar'
 import_jar = 'local:///app/import-task.jar'
 index_jar = 'local:///app/index-task.jar'
 publish_jar = 'local:///app/publish-task.jar'
+obo_parser_jar = 'local:///app/obo-parser.jar'
 
 etl_base_config = SparkOperatorConfig(
     spark_configs=[spark_default_conf],
@@ -150,11 +155,6 @@ etl_base_config = SparkOperatorConfig(
 etl_index_config = etl_base_config \
     .add_spark_conf(spark_small_conf, spark_index_conf) \
     .with_spark_jar(index_jar)
-
-etl_publish_config = etl_base_config \
-    .add_spark_conf(spark_small_conf, spark_index_conf) \
-    .with_spark_jar(publish_jar) \
-    .with_spark_class('bio.ferlab.fhir.etl.PublishTask')
 
 etl_variant_config = etl_base_config \
     .add_spark_conf(spark_large_conf) \
