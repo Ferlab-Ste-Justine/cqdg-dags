@@ -25,7 +25,7 @@ fhir_import_config = FhirCsvConfig(
 
 def fhir_import():
     csv_import = (fhir_import_config
-    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, project(), "true", is_restricted())
+    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, project(), "true")
     .operator(
         task_id='fhir_import',
         name='etl-fhir_import',
@@ -45,7 +45,6 @@ with DAG(
             'studyVersion': Param('13', type='string'),
             'study_code': Param('cag', type='string'),
             'project': Param('jmichaud', type='string'),
-            'is_restricted': Param('false', enum=['true', 'false']),
         },
 ) as dag:
     def prefix() -> str:
@@ -62,9 +61,5 @@ with DAG(
 
     def project() -> str:
         return '{{ params.project }}'
-
-
-    def is_restricted() -> str:
-        return '{{ params.is_restricted }}'
 
     fhir_import()
