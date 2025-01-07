@@ -25,7 +25,7 @@ fhir_import_config = FhirCsvConfig(
 
 def fhir_import():
     csv_import = (fhir_import_config
-    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, project(), "true")
+    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, "true")
     .operator(
         task_id='fhir_import',
         name='etl-fhir_import',
@@ -40,26 +40,19 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'prefix': Param('prefix', type='string'),
+            'prefix': Param('clinical-data', type='string'),
             'studyId': Param('7', type='string'),
             'studyVersion': Param('13', type='string'),
             'study_code': Param('cag', type='string'),
-            'project': Param('jmichaud', type='string'),
         },
 ) as dag:
     def prefix() -> str:
         return '{{ params.prefix }}'
 
-
     def study_clin_data_id() -> str:
         return '{{ params.studyId }}'
 
-
     def study_clin_data_version() -> str:
         return '{{ params.studyVersion }}'
-
-
-    def project() -> str:
-        return '{{ params.project }}'
 
     fhir_import()
