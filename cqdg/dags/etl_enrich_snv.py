@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from lib.config import default_config_file, etl_base_config, spark_medium_conf, variant_jar, study_code, dataset, batch
+from cqdg.lib.config import default_config_file, etl_base_config, spark_medium_conf, variant_jar, study_code, dataset, batch
 
 with DAG(
         dag_id='etl-enrich-snv',

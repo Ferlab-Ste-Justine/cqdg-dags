@@ -6,8 +6,8 @@ from airflow.decorators import task
 from airflow.exceptions import ParamValidationError
 from airflow.models import Param, TaskInstance, DagRun
 
-from lib.config import spark_small_conf, default_config_file, default_params, variant_jar, etl_base_config
-from lib.operators.spark import SparkOperator
+from cqdg.lib.config import spark_small_conf, default_config_file, default_params, variant_jar, etl_base_config
+from cqdg.lib.operators.spark import SparkOperator
 
 # Update default params
 params = default_params.copy()

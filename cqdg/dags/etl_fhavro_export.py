@@ -1,10 +1,10 @@
 from airflow import DAG
 from airflow.models import Param, Variable
 from datetime import datetime
-from lib.config import env, fhir_url, datalake_bucket, keycloak_client_secret_name, keycloak_url, \
+from cqdg.lib.config import env, fhir_url, datalake_bucket, keycloak_client_secret_name, keycloak_url, \
     aws_secret_name, aws_secret_access_key, aws_secret_secret_key, kube_config, aws_endpoint, study_codes
-from lib.operators.fhavro import FhavroConfig
-from lib.slack import Slack
+from cqdg.lib.operators.fhavro import FhavroConfig
+from cqdg.lib.slack import Slack
 
 fhavro_config = FhavroConfig(
     fhir_url=fhir_url,

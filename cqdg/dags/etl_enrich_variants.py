@@ -3,8 +3,8 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from lib.config import etl_variant_config, default_config_file
-from lib.slack import Slack
+from cqdg.lib.config import etl_variant_config, default_config_file
+from cqdg.lib.slack import Slack
 
 etl_variant_enrich_config = etl_variant_config \
     .with_spark_class('bio.ferlab.etl.enriched.RunEnrichGenomic') \

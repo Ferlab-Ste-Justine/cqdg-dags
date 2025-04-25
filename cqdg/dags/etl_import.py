@@ -1,8 +1,8 @@
 from airflow import DAG
 from airflow.models.param import Param
 from datetime import datetime
-from lib.config import etl_base_config, spark_small_conf, import_jar, default_config_file, study_codes
-from lib.slack import Slack
+from cqdg.lib.config import etl_base_config, spark_small_conf, import_jar, default_config_file, study_codes
+from cqdg.lib.slack import Slack
 
 
 def etl_import():

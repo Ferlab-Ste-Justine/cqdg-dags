@@ -6,7 +6,7 @@ from kubernetes.client import models as k8s
 from typing import Optional, List, Type
 from collections import ChainMap
 import copy
-from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig
+from cqdg.lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig
 from typing_extensions import Self
 from dataclasses import dataclass, field, asdict
 

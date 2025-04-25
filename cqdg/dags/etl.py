@@ -5,13 +5,13 @@ from airflow.models.param import Param
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from es_templates_update import es_templates_update
-from etl_fhavro_export import fhavro_export
-from etl_import import etl_import
-from etl_index import index_operator
-from etl_prepare_index import prepare_index
-from etl_publish import publish_task
-from lib.slack import Slack
+from cqdg.dags.es_templates_update import es_templates_update
+from cqdg.dags.etl_fhavro_export import fhavro_export
+from cqdg.dags.etl_import import etl_import
+from cqdg.dags.etl_index import index_operator
+from cqdg.dags.etl_prepare_index import prepare_index
+from cqdg.dags.etl_publish import publish_task
+from cqdg.lib.slack import Slack
 
 with DAG(
         dag_id='etl',
