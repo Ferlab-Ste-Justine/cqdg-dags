@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Variable, Param
 
-from lib.config import datalake_bucket, etl_base_config, spark_small_conf, obo_parser_jar
+from cqdg.lib.config import datalake_bucket, etl_base_config, spark_small_conf, obo_parser_jar
 
 
 def obo_parser():

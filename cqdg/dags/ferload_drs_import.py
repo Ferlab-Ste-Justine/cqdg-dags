@@ -3,10 +3,10 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param, Variable
 
-from lib.config import fhir_url, keycloak_url, aws_secret_name, aws_secret_secret_key, clinical_data_bucket, \
+from cqdg.lib.config import fhir_url, keycloak_url, aws_secret_name, aws_secret_secret_key, clinical_data_bucket, \
     kube_config, keycloak_client_resource_secret_name, \
     aws_endpoint, study_code
-from lib.operators.drs_import import DrsImportConfig
+from cqdg.lib.operators.drs_import import DrsImportConfig
 
 drs_import_config = DrsImportConfig(
     fhir_url=fhir_url,

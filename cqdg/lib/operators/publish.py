@@ -1,7 +1,7 @@
 from kubernetes.client import models as k8s
 from typing import Optional, Type
 from dataclasses import dataclass
-from lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig, required
+from cqdg.lib.operators.base_kubernetes import BaseKubernetesOperator, BaseConfig, required
 
 
 class PublishOperator(BaseKubernetesOperator):

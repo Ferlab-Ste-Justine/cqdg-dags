@@ -1,5 +1,5 @@
 from airflow.models.baseoperator import BaseOperator
-from lib.slack import Slack
+from cqdg.lib.slack import Slack
 
 
 class SlackOperator(BaseOperator):

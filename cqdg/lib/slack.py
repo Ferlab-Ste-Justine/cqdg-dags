@@ -1,8 +1,8 @@
 import json
 import urllib.parse
-from lib import config
-from lib import utils
-from lib.config import env
+from cqdg.lib import config
+from cqdg.lib import utils
+from cqdg.lib.config import env
 
 
 class Slack:

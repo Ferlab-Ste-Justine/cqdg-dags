@@ -3,9 +3,9 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models.param import Param
 
-from etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
-from lib.config import default_config_file, study_code
-from lib.slack import Slack
+from cqdg.dags.etl_prepare_index import etl_base_config, spark_small_conf, prepare_index_jar
+from cqdg.lib.config import default_config_file, study_code
+from cqdg.lib.slack import Slack
 
 
 def etl_enrich_specimens():

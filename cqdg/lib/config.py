@@ -1,7 +1,7 @@
 from airflow.models import Variable, Param
 
-from lib.operators.base_kubernetes import KubeConfig
-from lib.operators.spark import SparkOperatorConfig
+from cqdg.lib.operators.base_kubernetes import KubeConfig
+from cqdg.lib.operators.spark import SparkOperatorConfig
 
 
 class Env:

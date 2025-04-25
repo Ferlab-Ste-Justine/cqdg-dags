@@ -7,9 +7,9 @@ from airflow.decorators import task
 from airflow.models import DagRun
 from airflow.models import Param
 
-from lib.config import default_config_file, study_code, etl_variant_config
-from lib.operators.spark import SparkOperator
-from lib.slack import Slack
+from cqdg.lib.config import default_config_file, study_code, etl_variant_config
+from cqdg.lib.operators.spark import SparkOperator
+from cqdg.lib.slack import Slack
 
 
 class NormalizeVariants(SparkOperator):

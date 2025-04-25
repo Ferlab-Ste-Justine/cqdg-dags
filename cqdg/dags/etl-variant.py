@@ -5,14 +5,14 @@ from airflow.models.param import Param
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-from es_templates_update import es_templates_update
-from etl_enrich_specimens import etl_enrich_specimens
-from etl_enrich_variants import variant_task_enrich_variants, variant_task_enrich_consequences
-from etl_index_variants import index_variants
-from etl_normalize_variants import extract_params, normalized_etl
-from etl_prepare_index_variants import etl_variant_prepared
-from etl_publish_variants import publish_task
-from lib.slack import Slack
+from cqdg.dags.es_templates_update import es_templates_update
+from cqdg.dags.etl_enrich_specimens import etl_enrich_specimens
+from cqdg.dags.etl_enrich_variants import variant_task_enrich_variants, variant_task_enrich_consequences
+from cqdg.dags.etl_index_variants import index_variants
+from cqdg.dags.etl_normalize_variants import extract_params, normalized_etl
+from cqdg.dags.etl_prepare_index_variants import etl_variant_prepared
+from cqdg.dags.etl_publish_variants import publish_task
+from cqdg.lib.slack import Slack
 
 with DAG(
         dag_id='etl-variant',

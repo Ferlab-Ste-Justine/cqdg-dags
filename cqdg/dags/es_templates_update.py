@@ -1,8 +1,8 @@
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 
-from lib.config import datalake_bucket, kube_config, aws_endpoint, aws_secret_name, aws_secret_access_key, aws_secret_secret_key
-from lib.slack import Slack
+from cqdg.lib.config import datalake_bucket, kube_config, aws_endpoint, aws_secret_name, aws_secret_access_key, aws_secret_secret_key
+from cqdg.lib.slack import Slack
 
 script = f"""
     #!/bin/bash
