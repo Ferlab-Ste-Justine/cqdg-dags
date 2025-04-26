@@ -1,4 +1,4 @@
-from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
 from typing import Optional, List, Type, TypeVar
 from typing_extensions import Self
 from kubernetes.client import models as k8s
