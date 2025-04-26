@@ -3,7 +3,7 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param, Variable
 
-from ferload_drs_import import ferload_drs_import
+from cqdg.dags.ferload_drs_import import ferload_drs_import
 from cqdg.lib.config import fhir_url, keycloak_client_secret_name, keycloak_url, aws_secret_name, aws_secret_access_key, \
     aws_secret_secret_key, clinical_data_bucket, file_import_bucket, kube_config, aws_endpoint, study_code
 from cqdg.lib.operators.fhir_import import FhirCsvOperator, FhirCsvConfig
