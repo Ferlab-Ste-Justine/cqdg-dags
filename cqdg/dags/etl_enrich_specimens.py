@@ -28,7 +28,7 @@ with DAG(
         start_date=datetime(2022, 1, 1),
         schedule_interval=None,
         params={
-            'study_codes': Param('CAG', type='string'),
+            'study_code': Param('CAG', type='string'),
             'project': Param('cqdg', type='string'),
         },
 ) as dag:
