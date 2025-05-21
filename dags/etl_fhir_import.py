@@ -25,7 +25,7 @@ fhir_import_config = FhirCsvConfig(
 
 def fhir_import():
     csv_import = (fhir_import_config
-    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code, "true")
+    .args(prefix(), study_clin_data_id(), study_clin_data_version(), study_code)
     .operator(
         task_id='fhir_import',
         name='etl-fhir_import',
