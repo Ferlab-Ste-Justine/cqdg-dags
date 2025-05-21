@@ -43,7 +43,7 @@ with DAG(
             'prefix': Param('clinical-data', type='string'),
             'studyId': Param('7', type='string'),
             'studyVersion': Param('13', type='string'),
-            'study_code': Param('cag', type='string'),
+            'study_code': Param('cag_TEST', type='string'),
         },
 ) as dag:
     def prefix() -> str:
