@@ -36,10 +36,11 @@ x-airflow-common:
     AIRFLOW_VAR_PUBLISH_IMAGE: ${PUBLISH_IMAGE}
     AIRFLOW_VAR_FHIR_IMPORT_IMAGE: ${FHIR_IMPORT_IMAGE}
     AIRFLOW_VAR_FERLOAD_DRS_IMPORT_IMAGE: ${FERLOAD_DRS_IMPORT_IMAGE}
+    AIRFLOW_VAR_DATA_MANAGEMENT_METADATA_IMAGE: ${DATA_MANAGEMENT_METADATA_IMAGE}
     AIRFLOW_VAR_SLACK_HOOK_URL: ${SLACK_HOOK_URL}
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
-    - ${DAGS_DIR}:/opt/airflow/dags
+    - ${DAGS_DIR}:/opt/airflow/dags/${DAGS_DIR}
     - ${KUBE_CONFIG}:/home/airflow/.kube/config
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
