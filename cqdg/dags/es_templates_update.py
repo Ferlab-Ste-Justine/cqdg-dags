@@ -26,6 +26,7 @@ script = f"""
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_file_centric.json --output ./templates/template_file_centric.json
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_participant_centric.json --output ./templates/template_participant_centric.json
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
+    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_program_centric.json --output ./templates/template_program_centric.json
     
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_variant_centric.json --output ./templates/template_variant_centric.json
     curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_centric.json --output ./templates/template_gene_centric.json
@@ -37,6 +38,7 @@ script = f"""
     mc cp ./templates/template_file_centric.json myminio/{datalake_bucket}/templates/template_file_centric.json
     mc cp ./templates/template_participant_centric.json myminio/{datalake_bucket}/templates/template_participant_centric.json
     mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_biospecimen_centric.json 
+    mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_program_centric.json 
         
     mc cp ./templates/template_variant_centric.json myminio/{datalake_bucket}/templates/template_variant_centric.json     
     mc cp ./templates/template_gene_centric.json myminio/{datalake_bucket}/templates/template_gene_centric.json     

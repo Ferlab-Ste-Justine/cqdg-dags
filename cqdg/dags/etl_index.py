@@ -18,6 +18,6 @@ with DAG(
             'study_codes': Param('CAG', type='string'),
             'project': Param('cqdg', type='string')
         },
-) as dag: 
-    index_operator('study') >> index_operator('participant') >> index_operator('file') >>  index_operator('biospecimen') 
+) as dag:
+    index_operator('program') >> index_operator('study') >> index_operator('participant') >> index_operator('file') >>  index_operator('biospecimen')
 
