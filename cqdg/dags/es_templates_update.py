@@ -38,7 +38,7 @@ script = f"""
     mc cp ./templates/template_file_centric.json myminio/{datalake_bucket}/templates/template_file_centric.json
     mc cp ./templates/template_participant_centric.json myminio/{datalake_bucket}/templates/template_participant_centric.json
     mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_biospecimen_centric.json 
-    mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_program_centric.json 
+    mc cp ./templates/template_program_centric.json myminio/{datalake_bucket}/templates/template_program_centric.json 
         
     mc cp ./templates/template_variant_centric.json myminio/{datalake_bucket}/templates/template_variant_centric.json     
     mc cp ./templates/template_gene_centric.json myminio/{datalake_bucket}/templates/template_gene_centric.json     
