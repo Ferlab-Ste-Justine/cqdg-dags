@@ -36,6 +36,6 @@ with DAG(
     )
 
     with TaskGroup(group_id='index') as index:
-        index_operator('study') >> index_operator('participant') >> index_operator('file') >> index_operator('biospecimen')
+        index_operator('program') >> index_operator('study') >> index_operator('participant') >> index_operator('file') >> index_operator('biospecimen')
 
     start >> fhavro_export() >> etl_import() >> prepare_index() >> es_templates_update() >> index >>  publish_task('study_centric,participant_centric,file_centric,biospecimen_centric') >> slack
