@@ -3,16 +3,16 @@ from datetime import datetime
 from airflow import DAG
 from airflow.models import Param, Variable
 
-from cqdg.lib.config import fhir_url, keycloak_url, aws_secret_name, aws_secret_secret_key, clinical_data_bucket, \
+from cqdg.lib.config import fhir_url, aws_secret_name, aws_secret_secret_key, clinical_data_bucket, \
     kube_config, keycloak_client_resource_secret_name, \
-    aws_endpoint, study_code
+    aws_endpoint, study_code, keycloak_url_external
 from cqdg.lib.operators.drs_import import DrsImportConfig
 
 drs_import_config = DrsImportConfig(
     fhir_url=fhir_url,
     ferload_url=Variable.get('ferload_url'),
     keycloak_client_secret_name=keycloak_client_resource_secret_name,
-    keycloak_url=keycloak_url,
+    keycloak_url=keycloak_url_external,
     aws_endpoint=aws_endpoint,
     aws_credentials_secret_name=aws_secret_name,
     aws_credentials_secret_secret_key=aws_secret_secret_key,
