@@ -15,6 +15,7 @@ env = Variable.get('environment')
 es_url = Variable.get('es_url')
 es_port = Variable.get('es_port', '9200')
 keycloak_url = Variable.get('keycloak_url')
+keycloak_url_external = Variable.get('keycloak_url_external')
 fhir_url = Variable.get('fhir_url')
 
 slack_hook_url = Variable.get('slack_hook_url', None)
