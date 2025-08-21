@@ -8,6 +8,10 @@ from cqdg.lib.config import datalake_bucket, etl_base_config, spark_small_conf, 
 
 def obo_parser():
     return etl_base_config \
+        .with_extra_env_variables(
+        {'key': 'DATALAKE_BUCKET', 'value': 'datalake_bucket'},
+        {'key': 'OBJECT_STORE_URL', 'value': 'object_store_url'}
+        ) \
         .with_spark_class('bio.ferlab.HPOMain') \
         .with_image(Variable.get('obo_parser_image')) \
         .with_spark_jar(obo_parser_jar) \

@@ -2,6 +2,7 @@ import kubernetes
 import logging
 from airflow.exceptions import AirflowFailException
 from airflow.exceptions import AirflowSkipException
+from airflow.models import Variable
 from kubernetes.client import models as k8s
 from typing import Optional, List, Type
 from collections import ChainMap
@@ -23,6 +24,7 @@ class SparkOperator(BaseKubernetesOperator):
             spark_config_volume: Optional[str] = None,
             spark_packages: List[str] = [],
             spark_exclude_packages: List[str] = [],
+            spark_extra_env_variables: List[dict] = [],
             is_skip: bool = False,
             is_skip_fail: bool = False,
 
@@ -37,6 +39,7 @@ class SparkOperator(BaseKubernetesOperator):
         self.spark_config_volume = spark_config_volume
         self.spark_packages = spark_packages
         self.spark_exclude_packages = spark_exclude_packages
+        self.spark_extra_env_variables = spark_extra_env_variables
         self.is_skip = is_skip
         self.is_skip_fail = is_skip_fail
 
@@ -72,6 +75,12 @@ class SparkOperator(BaseKubernetesOperator):
         # Build --conf attributes
         spark_config_reversed = reversed(self.spark_configs)
         merged_config = dict(ChainMap(*spark_config_reversed))
+
+        # Add Spark environment configs for driver, if any.
+        for env in self.spark_extra_env_variables:
+            key = env['key']
+            value = env['value']
+            merged_config[f'spark.kubernetes.driverEnv.{key}'] = Variable.get(value)
 
         if 'spark.kubernetes.driver.container.image' not in merged_config.keys() and 'spark.kubernetes.container.image' not in merged_config.keys():
             merged_config['spark.kubernetes.driver.container.image'] = self.image
@@ -179,6 +188,7 @@ class SparkOperatorConfig(BaseConfig):
     spark_config_volume: Optional[str] = None
     spark_packages: List[str] = field(default_factory=list)
     spark_exclude_packages: List[str] = field(default_factory=list)
+    spark_extra_env_variables: List[dict] = field(default_factory=list)
     is_skip: bool = False
     is_skip_fail: bool = False
 
@@ -246,6 +256,11 @@ class SparkOperatorConfig(BaseConfig):
     def with_spark_config_volume(self, spark_config_volume: str) -> Self:
         c = copy.copy(self)
         c.spark_config_volume = spark_config_volume
+        return c
+
+    def with_extra_env_variables(self, *extra_env_variables) -> Self:
+        c = copy.copy(self)
+        c.spark_extra_env_variables = [*self.spark_extra_env_variables, *extra_env_variables]
         return c
 
     def operator(self, class_to_instantiate: Type[SparkOperator] = SparkOperator, **kwargs) -> BaseKubernetesOperator:
