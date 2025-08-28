@@ -32,7 +32,7 @@ with DAG(
         params={
             'obo_url': Param('https://purl.obolibrary.org/obo/hp.obo',
                              type='string'),
-            'ontology_type': Param('hpo', type='string', enum=['icd', 'mondo', 'hpo', 'ncit']),
+            'ontology_type': Param('hpo', type='string', enum=['icd-o', 'icd-10', 'mondo', 'hpo', 'ncit']),
             'required_top_node': Param("", type=["null", "string"]),
         },
 ) as dag:
