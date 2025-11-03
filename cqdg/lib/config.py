@@ -30,6 +30,7 @@ hive_metastore_uri = Variable.get('hive_metastore_uri')
 datalake_bucket = Variable.get('datalake_bucket')
 clinical_data_bucket = Variable.get('clinical_data_bucket')
 file_import_bucket = Variable.get('file_import_bucket')
+public_bucket = Variable.get('public_bucket')
 
 keycloak_client_secret_name = 'keycloak-client-system-credentials'
 keycloak_client_resource_secret_name = 'keycloak-client-resource-server-credentials'
