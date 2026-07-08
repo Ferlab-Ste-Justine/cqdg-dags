@@ -9,7 +9,7 @@ script = f"""
     
     apk update; apk add -U curl
     
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+    curl --location --fail https://dl.min.io/client/mc/release/linux-amd64/mc \
     --create-dirs \
     -o $HOME/minio-binaries/mc
 
