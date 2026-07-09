@@ -6,44 +6,37 @@ from cqdg.lib.slack import Slack
 
 script = f"""
     #!/bin/bash
-    
+    set -eu
+
     apk update; apk add -U curl
-    
+
     curl --location --fail https://dl.min.io/client/mc/release/linux-amd64/mc \
     --create-dirs \
     -o $HOME/minio-binaries/mc
 
     chmod +x $HOME/minio-binaries/mc
     export PATH=$PATH:$HOME/minio-binaries/
-    
+
     echo Setting MC alias to this minio: $AWS_ENDPOINT
     mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
-    
-    mkdir templates
-    
+
+    mkdir -p templates
+
+    TEMPLATES="template_study_centric.json template_file_centric.json template_participant_centric.json template_biospecimen_centric.json template_program_centric.json template_variant_centric.json template_gene_centric.json template_variant_suggestions.json template_gene_suggestions.json"
+    RAW_BASE=https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates
+
     echo Downloading templates ...
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_study_centric.json --output ./templates/template_study_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_file_centric.json --output ./templates/template_file_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_participant_centric.json --output ./templates/template_participant_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_biospecimen_centric.json --output ./templates/template_biospecimen_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_program_centric.json --output ./templates/template_program_centric.json
-    
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_variant_centric.json --output ./templates/template_variant_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_centric.json --output ./templates/template_gene_centric.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_variant_suggestions.json --output ./templates/template_variant_suggestions.json
-    curl  https://raw.githubusercontent.com/Ferlab-Ste-Justine/etl-cqdg-portal/master/index-task/src/main/resources/templates/template_gene_suggestions.json --output ./templates/template_gene_suggestions.json
-    
+    for t in $TEMPLATES; do
+        # --fail: a non-2xx (e.g. GitHub 429) becomes a curl error instead of being
+        #         written to the output file; --retry handles transient rate-limiting.
+        curl --fail --location --show-error --retry 5 --retry-delay 5 \
+            "$RAW_BASE/$t" --output "./templates/$t"
+    done
+
     echo Copy templates ...
-    mc cp ./templates/template_study_centric.json myminio/{datalake_bucket}/templates/template_study_centric.json
-    mc cp ./templates/template_file_centric.json myminio/{datalake_bucket}/templates/template_file_centric.json
-    mc cp ./templates/template_participant_centric.json myminio/{datalake_bucket}/templates/template_participant_centric.json
-    mc cp ./templates/template_biospecimen_centric.json myminio/{datalake_bucket}/templates/template_biospecimen_centric.json 
-    mc cp ./templates/template_program_centric.json myminio/{datalake_bucket}/templates/template_program_centric.json 
-        
-    mc cp ./templates/template_variant_centric.json myminio/{datalake_bucket}/templates/template_variant_centric.json     
-    mc cp ./templates/template_gene_centric.json myminio/{datalake_bucket}/templates/template_gene_centric.json     
-    mc cp ./templates/template_variant_suggestions.json myminio/{datalake_bucket}/templates/template_variant_suggestions.json     
-    mc cp ./templates/template_gene_suggestions.json myminio/{datalake_bucket}/templates/template_gene_suggestions.json     
+    for t in $TEMPLATES; do
+        mc cp "./templates/$t" "myminio/{datalake_bucket}/templates/$t"
+    done
 """
 
 def es_templates_update():
