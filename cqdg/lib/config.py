@@ -85,6 +85,7 @@ spark_default_conf = {
     'spark.eventLog.dir': f's3a://{datalake_bucket}/spark-logs',
     'spark.driver.extraJavaOptions': javaOptsIvy,
     'spark.jars.ivy': '/tmp',
+    'spark.jars.repositories': 'https://maven-central.storage-download.googleapis.com/maven2/',
     'spark.log.level': 'WARN'
 }
 
