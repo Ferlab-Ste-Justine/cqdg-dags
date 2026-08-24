@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 
@@ -73,3 +76,10 @@ def es_templates_update():
             ), ],
         on_failure_callback=Slack.notify_task_failure
     )
+
+with DAG(
+        dag_id='es-templates-update',
+        start_date=datetime(2022, 1, 1),
+        schedule_interval=None,
+) as dag:
+    es_templates_update()
