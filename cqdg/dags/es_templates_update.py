@@ -4,24 +4,19 @@ from airflow import DAG
 from airflow.providers.cncf.kubernetes.operators.pod import KubernetesPodOperator
 from kubernetes.client import models as k8s
 
-from cqdg.lib.config import datalake_bucket, kube_config, aws_endpoint, aws_secret_name, aws_secret_access_key, aws_secret_secret_key
+from cqdg.lib.config import (
+    aws_endpoint,
+    aws_secret_access_key,
+    aws_secret_name,
+    aws_secret_secret_key,
+    datalake_bucket,
+    kube_config,
+)
 from cqdg.lib.slack import Slack
 
 script = f"""
     #!/bin/bash
     set -eu
-
-    apk update; apk add -U curl
-
-    curl --location --fail https://dl.min.io/client/mc/release/linux-amd64/mc \
-    --create-dirs \
-    -o $HOME/minio-binaries/mc
-
-    chmod +x $HOME/minio-binaries/mc
-    export PATH=$PATH:$HOME/minio-binaries/
-
-    echo Setting MC alias to this minio: $AWS_ENDPOINT
-    mc alias set myminio $AWS_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
 
     mkdir -p templates
 
@@ -36,28 +31,37 @@ script = f"""
             "$RAW_BASE/$t" --output "./templates/$t"
     done
 
-    echo Copy templates ...
+    echo Copy templates to $AWS_ENDPOINT ...
     for t in $TEMPLATES; do
-        mc cp "./templates/$t" "myminio/{datalake_bucket}/templates/$t"
+        aws --endpoint-url "$AWS_ENDPOINT" s3 cp "./templates/$t" "s3://{datalake_bucket}/templates/$t"
     done
 """
 
+
 def es_templates_update():
     return KubernetesPodOperator(
-        task_id='es_templates_update',
-        name='es-templates-update',
-        image="alpine:3.14",
+        task_id="es_templates_update",
+        name="es-templates-update",
+        image="amazon/aws-cli:2.36.46",
         is_delete_operator_pod=True,
         cmds=["sh", "-cx"],
         arguments=[script],
         namespace=kube_config.namespace,
         env_vars=[
             k8s.V1EnvVar(
-                name='AWS_ENDPOINT',
+                name="AWS_ENDPOINT",
                 value=aws_endpoint,
             ),
             k8s.V1EnvVar(
-                name='AWS_ACCESS_KEY_ID',
+                name="AWS_REGION",
+                value="us-east-1",
+            ),
+            k8s.V1EnvVar(
+                name="AWS_REQUEST_CHECKSUM_CALCULATION",
+                value="when_required",
+            ),
+            k8s.V1EnvVar(
+                name="AWS_ACCESS_KEY_ID",
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
                         name=aws_secret_name,
@@ -66,20 +70,22 @@ def es_templates_update():
                 ),
             ),
             k8s.V1EnvVar(
-                name='AWS_SECRET_ACCESS_KEY',
+                name="AWS_SECRET_ACCESS_KEY",
                 value_from=k8s.V1EnvVarSource(
                     secret_key_ref=k8s.V1SecretKeySelector(
                         name=aws_secret_name,
                         key=aws_secret_secret_key,
                     ),
                 ),
-            ), ],
-        on_failure_callback=Slack.notify_task_failure
+            ),
+        ],
+        on_failure_callback=Slack.notify_task_failure,
     )
 
+
 with DAG(
-        dag_id='es-templates-update',
-        start_date=datetime(2022, 1, 1),
-        schedule_interval=None,
+    dag_id="es-templates-update",
+    start_date=datetime(2022, 1, 1),
+    schedule_interval=None,
 ) as dag:
     es_templates_update()
